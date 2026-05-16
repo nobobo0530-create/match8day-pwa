@@ -97,7 +97,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans',sans-serif;bac
 /* ── UNIFIED SCHEDULE CARD ── */
 .sched-card{background:var(--card);border-radius:var(--r);overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.07)}
 .srow{
-  display:flex;align-items:center;gap:10px;padding:12px 16px;
+  display:flex;align-items:center;gap:10px;padding:15px 16px;
   border-bottom:.5px solid var(--sep);transition:opacity .2s;
   position:relative;
 }
@@ -154,6 +154,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans',sans-serif;bac
 }
 .del-btn:active{background:rgba(0,0,0,.05)}
 .fx-badge{font-size:10px;font-weight:600;color:var(--sub2);background:rgba(118,118,128,.1);border-radius:5px;padding:2px 6px;flex-shrink:0}
+.fx-content{flex:1;display:flex;flex-direction:column;gap:6px;min-width:0}
+.fx-times{display:flex;align-items:center;gap:6px}
 
 /* add button */
 .add-row{
@@ -164,7 +166,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans',sans-serif;bac
 
 /* ── TODO ── */
 .todo-row{
-  display:flex;align-items:center;gap:12px;padding:12px 16px;
+  display:flex;align-items:center;gap:12px;padding:15px 16px;
   border-bottom:.5px solid var(--sep);
 }
 .todo-row:last-of-type{border-bottom:none}
@@ -247,7 +249,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans',sans-serif;bac
 }
 .ld{width:6px;height:6px;border-radius:50%;flex-shrink:0}
 .refl-item{
-  display:flex;align-items:flex-start;padding:14px 16px;gap:12px;
+  display:flex;align-items:flex-start;padding:16px 16px;gap:12px;
   border-bottom:.5px solid var(--sep);
 }
 .refl-item:last-child{border-bottom:none}
@@ -345,12 +347,12 @@ const THEMES=[
   ['🔥','コンディションを上げる日'],['🏆','本番のつもりで臨む日'],
 ];
 const FX_DEF=[
-  {id:'wake',  label:'起床',                def:'08:00'},
-  {id:'jog',   label:'ジョギング',           def:'08:30'},
-  {id:'clean', label:'片付け',               def:'09:00'},
-  {id:'plan',  label:'やることリスト作成',    def:'10:00'},
-  {id:'night', label:'シャワー・夜ご飯・洗濯',def:'21:00'},
-  {id:'sleep', label:'就寝',                def:'23:00'},
+  {id:'wake',  label:'起床',                defS:'08:00', defE:'08:00'},
+  {id:'jog',   label:'ジョギング',           defS:'08:00', defE:'08:30'},
+  {id:'clean', label:'片付け',               defS:'08:30', defE:'09:00'},
+  {id:'plan',  label:'やることリスト作成',    defS:'09:00', defE:'10:00'},
+  {id:'night', label:'シャワー・夜ご飯・洗濯',defS:'21:00', defE:'23:00'},
+  {id:'sleep', label:'就寝',                defS:'23:00', defE:'23:00'},
 ];
 const STREAK_MSG=['まずは1日目！','2日連続！','3日継続中！','折り返し！','5日突破！','残り3日！','あと1日！','全8日達成！🏆'];
 
@@ -371,7 +373,7 @@ function ds(date){
   if(!S.days)S.days={};
   if(!S.days[date])S.days[date]={};
   const d=S.days[date];
-  if(!d.ft)d.ft={};if(!d.fd)d.fd={};
+  if(!d.ft)d.ft={};if(!d.fd)d.fd={};if(!d.fl)d.fl={};
   if(!d.fb)d.fb=[];if(!d.todos)d.todos=[];
   if(!d.refl)d.refl={d1:'',d2:'',d3:'',ax:'',tm:''};
   if(d.rs===undefined)d.rs=false;
@@ -404,17 +406,13 @@ function renderHome(){
   // build items array
   const items=[];
   FX_DEF.forEach(f=>{
-    items.push({type:'fx',id:f.id,label:f.label,time:d.ft[f.id]||f.def,done:!!d.fd[f.id]});
+    items.push({type:'fx',id:f.id,label:d.fl[f.id]||f.label,start:d.ft[f.id+'-s']||f.defS,end:d.ft[f.id+'-e']||f.defE,done:!!d.fd[f.id]});
   });
   d.fb.forEach((b,i)=>{
     items.push({type:'fr',i,start:b.s||'',end:b.e||'',label:b.l||'',done:!!b.done});
   });
   // sort by time
-  items.sort((a,b)=>{
-    const at=a.type==='fx'?timeVal(a.time):timeVal(a.start);
-    const bt=b.type==='fx'?timeVal(b.time):timeVal(b.start);
-    return at-bt;
-  });
+  items.sort((a,b)=>timeVal(a.start)-timeVal(b.start));
 
   const fxDone=FX_DEF.filter(f=>d.fd[f.id]).length;
   let html=`<div class="sec-lbl">スケジュール<span class="sec-count">${fxDone}/${FX_DEF.length}</span></div>
@@ -425,9 +423,15 @@ function renderHome(){
       html+=`<div class="srow fx${item.done?' done':''}">
         <div class="srow-type"></div>
         <div class="chk${item.done?' on':''}" data-a="fx" data-id="${item.id}"></div>
-        <input class="ti" type="time" value="${item.time}" data-a="fxt" data-id="${item.id}">
-        <div class="row-lbl">${item.label}</div>
-        <span class="fx-badge">固定</span>
+        <div class="fx-content">
+          <input class="fr-lbl-inp" type="text" value="${e(item.label)}" data-a="fxl" data-id="${item.id}" style="font-size:15px;font-weight:500">
+          <div class="fx-times">
+            <input class="ti" type="time" value="${item.start}" data-a="fxs" data-id="${item.id}">
+            <span class="t-sep">–</span>
+            <input class="ti" type="time" value="${item.end}" data-a="fxe" data-id="${item.id}">
+            <span class="fx-badge">固定</span>
+          </div>
+        </div>
       </div>`;
     } else {
       const trange=item.start&&item.end?`${item.start.slice(0,5)}–${item.end.slice(0,5)}`:item.start?item.start.slice(0,5):'';
@@ -555,14 +559,16 @@ hb.addEventListener('click',ev=>{
 hb.addEventListener('change',ev=>{
   const el=ev.target,a=el.dataset.a;if(!a)return;
   const d=ds(todayStr());
-  if(a==='fxt'){d.ft[el.dataset.id]=el.value;save();renderHome();}
+  if(a==='fxs'){d.ft[el.dataset.id+'-s']=el.value;save();renderHome();}
+  else if(a==='fxe'){d.ft[el.dataset.id+'-e']=el.value;save();renderHome();}
   else if(a==='frs'){d.fb[+el.dataset.i].s=el.value;save();renderHome();}
   else if(a==='fre'){d.fb[+el.dataset.i].e=el.value;save();renderHome();}
 });
 hb.addEventListener('input',ev=>{
   const el=ev.target,a=el.dataset.a;if(!a)return;
   const d=ds(todayStr());
-  if(a==='frl'){d.fb[+el.dataset.i].l=el.value;save();}
+  if(a==='fxl'){d.fl[el.dataset.id]=el.value;save();}
+  else if(a==='frl'){d.fb[+el.dataset.i].l=el.value;save();}
   else if(a==='tdt'){d.todos[+el.dataset.i].text=el.value;save();}
 });
 hb.addEventListener('keydown',ev=>{
