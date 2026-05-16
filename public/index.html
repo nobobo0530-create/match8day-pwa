@@ -5,191 +5,334 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="8日間">
-<meta name="theme-color" content="#e84444">
+<meta name="theme-color" content="#c0392b">
 <link rel="manifest" href="/manifest.json">
 <title>試合まで8日間</title>
 <style>
-*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;background:#f7f7f7;color:#1a1a1a;min-height:100vh;padding-bottom:env(safe-area-inset-bottom)}
+:root {
+  --red: #e84444;
+  --orange: #f5a623;
+  --grad: linear-gradient(135deg, #e84444 0%, #f5a623 100%);
+  --bg: #f2f2f7;
+  --card: #ffffff;
+  --border: #e8e8ed;
+  --text: #1c1c1e;
+  --sub: #6d6d72;
+  --done-op: 0.35;
+  --radius: 16px;
+  --tab-h: 60px;
+  --safe-b: env(safe-area-inset-bottom, 0px);
+  --safe-t: env(safe-area-inset-top, 0px);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
 
 /* ── Setup ── */
-#setup{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:32px 24px;background:linear-gradient(160deg,#e84444 0%,#f5a623 100%)}
-#setup h1{color:#fff;font-size:26px;font-weight:800;text-align:center;margin-bottom:8px;text-shadow:0 2px 8px rgba(0,0,0,.2)}
-#setup p{color:rgba(255,255,255,.9);font-size:14px;margin-bottom:40px;text-align:center}
-#setup label{color:#fff;font-size:13px;font-weight:600;margin-bottom:8px;display:block;align-self:flex-start}
-#setup input[type=date]{width:100%;padding:14px 16px;border-radius:14px;border:none;font-size:17px;background:#fff;color:#1a1a1a;margin-bottom:24px;outline:none}
-#setup button{width:100%;padding:16px;border-radius:16px;border:none;font-size:18px;font-weight:700;background:#fff;color:#e84444;cursor:pointer;box-shadow:0 4px 20px rgba(0,0,0,.15)}
+#setup-screen { position: fixed; inset: 0; z-index: 999; background: var(--grad); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 28px; padding-top: calc(40px + var(--safe-t)); }
+.setup-logo { font-size: 52px; margin-bottom: 16px; }
+.setup-title { color: #fff; font-size: 28px; font-weight: 800; text-align: center; margin-bottom: 6px; letter-spacing: -0.5px; }
+.setup-sub { color: rgba(255,255,255,.8); font-size: 15px; text-align: center; margin-bottom: 44px; }
+.setup-card { background: #fff; border-radius: 20px; padding: 24px; width: 100%; max-width: 360px; box-shadow: 0 8px 32px rgba(0,0,0,.18); }
+.setup-card label { display: block; font-size: 13px; font-weight: 700; color: var(--sub); margin-bottom: 10px; letter-spacing: .3px; }
+.setup-card input[type=date] { width: 100%; padding: 14px 16px; border-radius: 12px; border: 2px solid var(--border); font-size: 17px; color: var(--text); background: var(--bg); outline: none; margin-bottom: 20px; font-family: inherit; }
+.setup-card input[type=date]:focus { border-color: var(--red); }
+.setup-start { width: 100%; padding: 16px; border-radius: 14px; border: none; background: var(--grad); color: #fff; font-size: 17px; font-weight: 700; cursor: pointer; letter-spacing: .3px; }
 
-/* ── App header ── */
-#app{max-width:430px;margin:0 auto;padding:0 0 80px}
-.app-header{background:linear-gradient(135deg,#e84444 0%,#f5a623 100%);padding:20px 20px 24px;padding-top:calc(20px + env(safe-area-inset-top))}
-.app-header .date-label{color:rgba(255,255,255,.85);font-size:13px;font-weight:500}
-.app-header .date-main{color:#fff;font-size:22px;font-weight:800;margin:2px 0 8px}
-.countdown-row{display:flex;align-items:baseline;gap:6px}
-.countdown-num{color:#fff;font-size:48px;font-weight:900;line-height:1;text-shadow:0 2px 12px rgba(0,0,0,.2)}
-.countdown-unit{color:rgba(255,255,255,.9);font-size:16px;font-weight:600}
-.countdown-match{color:rgba(255,255,255,.8);font-size:13px;margin-top:4px}
+/* ── App shell ── */
+#app-screen { display: none; }
+#app-screen.show { display: block; }
+.screen { display: none; padding-bottom: calc(var(--tab-h) + var(--safe-b) + 16px); }
+.screen.active { display: block; }
 
-/* ── Theme banner ── */
-.theme-banner{background:#fff;margin:0 16px;margin-top:-12px;border-radius:16px;padding:16px 18px;box-shadow:0 4px 16px rgba(0,0,0,.08)}
-.theme-day{font-size:12px;font-weight:700;color:#e84444;text-transform:uppercase;letter-spacing:.5px}
-.theme-text{font-size:17px;font-weight:700;color:#1a1a1a;margin-top:4px;line-height:1.4}
+/* ── Header ── */
+.app-header {
+  background: var(--grad);
+  padding: 20px 20px 28px;
+  padding-top: calc(16px + var(--safe-t));
+  position: relative;
+}
+.header-top { display: flex; justify-content: space-between; align-items: flex-start; }
+.header-date-label { color: rgba(255,255,255,.75); font-size: 12px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; }
+.header-date { color: #fff; font-size: 22px; font-weight: 800; margin-top: 2px; letter-spacing: -0.3px; }
+.header-day-badge { background: rgba(255,255,255,.25); border-radius: 20px; padding: 5px 14px; color: #fff; font-size: 13px; font-weight: 700; white-space: nowrap; margin-top: 4px; }
+.countdown-row { margin-top: 12px; display: flex; align-items: baseline; gap: 4px; }
+.countdown-num { color: #fff; font-size: 60px; font-weight: 900; line-height: 1; letter-spacing: -2px; }
+.countdown-unit { color: rgba(255,255,255,.9); font-size: 20px; font-weight: 700; }
+.countdown-match { color: rgba(255,255,255,.75); font-size: 13px; margin-top: 6px; }
 
-/* ── Section ── */
-.section{margin:16px 16px 0;background:#fff;border-radius:16px;box-shadow:0 2px 10px rgba(0,0,0,.06);overflow:hidden}
-.section-header{padding:14px 16px 10px;display:flex;align-items:center;gap:8px;border-bottom:1px solid #f0f0f0}
-.section-icon{font-size:16px}
-.section-title{font-size:14px;font-weight:700;color:#1a1a1a}
+/* ── Theme card ── */
+.theme-card {
+  margin: -16px 16px 0;
+  background: #fff;
+  border-radius: var(--radius);
+  padding: 16px 18px;
+  box-shadow: 0 4px 20px rgba(0,0,0,.1);
+  display: flex; align-items: center; gap: 14px;
+}
+.theme-icon { font-size: 32px; flex-shrink: 0; }
+.theme-day-label { font-size: 11px; font-weight: 700; color: var(--red); letter-spacing: .5px; text-transform: uppercase; }
+.theme-text { font-size: 16px; font-weight: 700; color: var(--text); margin-top: 3px; }
 
-/* ── Fixed schedule ── */
-.sched-item{display:flex;align-items:center;padding:10px 16px;gap:10px;border-bottom:1px solid #f5f5f5}
-.sched-item:last-child{border-bottom:none}
-.sched-check{width:22px;height:22px;border-radius:50%;border:2px solid #ddd;flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s}
-.sched-check.done{background:#e84444;border-color:#e84444}
-.sched-check.done::after{content:'✓';color:#fff;font-size:12px;font-weight:700}
-.sched-time{flex-shrink:0}
-.sched-time input{border:none;background:#f5f5f5;border-radius:8px;padding:4px 8px;font-size:13px;font-weight:600;color:#555;width:100px;text-align:center;outline:none}
-.sched-time input:focus{background:#fff3e0;color:#e84444}
-.sched-label{flex:1;font-size:14px;color:#1a1a1a}
-.sched-item.done .sched-label{color:#bbb;text-decoration:line-through}
+/* ── Page content ── */
+.page-content { padding: 16px 16px 0; }
 
-/* ── Free zone ── */
-.free-zone-header{padding:10px 16px;font-size:12px;color:#999;border-bottom:1px solid #f5f5f5}
-.free-item{display:flex;align-items:center;padding:10px 16px;gap:8px;border-bottom:1px solid #f5f5f5}
-.free-item:last-child{border-bottom:none}
-.free-item .sched-check{width:20px;height:20px}
-.free-time{border:none;background:#f5f5f5;border-radius:8px;padding:4px 8px;font-size:13px;color:#555;width:90px;outline:none}
-.free-time:focus{background:#fff3e0;color:#e84444}
-.free-label{flex:1;border:none;background:transparent;font-size:14px;color:#1a1a1a;outline:none;min-width:0}
-.free-label:focus{color:#1a1a1a}
-.free-label::placeholder{color:#ccc}
-.free-del{background:none;border:none;color:#ccc;font-size:18px;cursor:pointer;padding:0 4px;flex-shrink:0}
-.free-del:hover{color:#e84444}
-.add-free-btn{display:flex;align-items:center;gap:6px;padding:12px 16px;font-size:14px;color:#e84444;font-weight:600;background:none;border:none;cursor:pointer;width:100%}
-.add-free-btn::before{content:'+';font-size:20px;font-weight:300}
+/* ── Section card ── */
+.scard { background: var(--card); border-radius: var(--radius); margin-bottom: 14px; overflow: hidden; box-shadow: 0 2px 12px rgba(0,0,0,.06); }
+.scard-header { display: flex; align-items: center; gap: 10px; padding: 14px 16px; border-bottom: 1px solid var(--border); }
+.scard-icon { font-size: 18px; }
+.scard-title { font-size: 15px; font-weight: 700; color: var(--text); flex: 1; }
+.scard-badge { background: var(--grad); border-radius: 20px; padding: 3px 10px; color: #fff; font-size: 11px; font-weight: 700; }
+
+/* ── Fixed schedule items ── */
+.sched-row { display: flex; align-items: center; gap: 12px; padding: 13px 16px; border-bottom: 1px solid var(--border); transition: opacity .2s; }
+.sched-row:last-child { border-bottom: none; }
+.sched-row.done { opacity: var(--done-op); }
+.check-circle { width: 26px; height: 26px; border-radius: 50%; border: 2.5px solid #ddd; flex-shrink: 0; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all .2s; }
+.check-circle.on { background: var(--grad); border-color: transparent; }
+.check-circle.on::after { content: '✓'; color: #fff; font-size: 13px; font-weight: 800; }
+.check-sq { width: 24px; height: 24px; border-radius: 7px; border: 2.5px solid #ddd; flex-shrink: 0; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all .2s; }
+.check-sq.on { background: var(--orange); border-color: transparent; }
+.check-sq.on::after { content: '✓'; color: #fff; font-size: 12px; font-weight: 800; }
+.sched-time-wrap { flex-shrink: 0; }
+.time-pill {
+  background: var(--bg);
+  border: none;
+  border-radius: 10px;
+  padding: 6px 10px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--sub);
+  cursor: pointer;
+  outline: none;
+  font-family: inherit;
+  text-align: center;
+  width: 96px;
+}
+.time-pill:focus { background: #fff3e0; color: var(--red); }
+.sched-label { flex: 1; font-size: 15px; color: var(--text); }
+.done .sched-label { text-decoration: line-through; }
+
+/* ── Free blocks ── */
+.free-row { display: flex; align-items: center; gap: 10px; padding: 12px 16px; border-bottom: 1px solid var(--border); }
+.free-row:last-of-type { border-bottom: none; }
+.free-row.done { opacity: var(--done-op); }
+.free-times { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
+.free-time-input {
+  background: var(--bg); border: none; border-radius: 10px;
+  padding: 7px 6px; font-size: 13px; font-weight: 600; color: var(--sub);
+  width: 72px; text-align: center; outline: none; font-family: inherit; cursor: pointer;
+}
+.free-time-input:focus { background: #fff3e0; color: var(--red); }
+.time-sep { font-size: 12px; color: #ccc; font-weight: 700; }
+.free-label-input { flex: 1; border: none; background: transparent; font-size: 15px; color: var(--text); outline: none; min-width: 0; font-family: inherit; }
+.free-label-input::placeholder { color: #ccc; }
+.del-btn { background: none; border: none; color: #ccc; font-size: 22px; cursor: pointer; padding: 0 2px; flex-shrink: 0; line-height: 1; }
+.del-btn:active { color: var(--red); }
+.add-block-btn { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 14px; font-size: 15px; font-weight: 600; color: var(--red); background: none; border: none; cursor: pointer; width: 100%; }
 
 /* ── Todo ── */
-.todo-item{display:flex;align-items:center;padding:10px 16px;gap:10px;border-bottom:1px solid #f5f5f5}
-.todo-check{width:22px;height:22px;border-radius:6px;border:2px solid #ddd;flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s}
-.todo-check.done{background:#f5a623;border-color:#f5a623}
-.todo-check.done::after{content:'✓';color:#fff;font-size:12px;font-weight:700}
-.todo-text{flex:1;font-size:14px;color:#1a1a1a;border:none;background:transparent;outline:none}
-.todo-text.done{color:#bbb;text-decoration:line-through}
-.todo-del{background:none;border:none;color:#ccc;font-size:18px;cursor:pointer;padding:0 4px}
-.todo-del:hover{color:#e84444}
-.todo-add-row{display:flex;padding:10px 16px;gap:8px;border-top:1px solid #f5f5f5}
-.todo-input{flex:1;border:none;background:#f5f5f5;border-radius:10px;padding:10px 14px;font-size:14px;outline:none}
-.todo-input:focus{background:#fff3e0}
-.todo-add-btn{background:#e84444;border:none;border-radius:10px;padding:10px 16px;color:#fff;font-size:14px;font-weight:700;cursor:pointer}
-
-/* ── Reflection ── */
-.refl-row{padding:12px 16px;border-bottom:1px solid #f5f5f5}
-.refl-row:last-of-type{border-bottom:none}
-.refl-label{font-size:12px;color:#999;margin-bottom:6px;display:flex;align-items:center;gap:6px}
-.refl-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
-.refl-dot.green{background:#4caf50}
-.refl-dot.blue{background:#2196f3}
-.refl-dot.orange{background:#f5a623}
-.refl-input{width:100%;border:none;background:#f5f5f5;border-radius:10px;padding:10px 14px;font-size:14px;color:#1a1a1a;resize:none;min-height:44px;outline:none;font-family:inherit}
-.refl-input:focus{background:#fff3e0}
-.refl-save-btn{margin:12px 16px;width:calc(100% - 32px);padding:14px;border-radius:12px;border:none;background:linear-gradient(135deg,#e84444,#f5a623);color:#fff;font-size:16px;font-weight:700;cursor:pointer;box-shadow:0 3px 12px rgba(232,68,68,.3)}
-.refl-saved-badge{margin:12px 16px;padding:10px;border-radius:10px;background:#e8f5e9;color:#4caf50;font-size:13px;font-weight:600;text-align:center}
+.todo-row { display: flex; align-items: center; gap: 12px; padding: 13px 16px; border-bottom: 1px solid var(--border); }
+.todo-row:last-of-type { border-bottom: none; }
+.todo-row.done { opacity: var(--done-op); }
+.todo-input-field { flex: 1; border: none; background: transparent; font-size: 15px; color: var(--text); outline: none; font-family: inherit; min-width: 0; }
+.todo-input-field.done { text-decoration: line-through; }
+.todo-add-wrap { display: flex; gap: 10px; padding: 12px 16px; border-top: 1px solid var(--border); }
+.todo-new-input { flex: 1; background: var(--bg); border: none; border-radius: 12px; padding: 12px 16px; font-size: 15px; outline: none; font-family: inherit; }
+.todo-new-input:focus { background: #fff3e0; }
+.add-btn { background: var(--grad); border: none; border-radius: 12px; padding: 12px 18px; color: #fff; font-size: 15px; font-weight: 700; cursor: pointer; flex-shrink: 0; }
 
 /* ── Streak ── */
-.streak-row{display:flex;align-items:center;justify-content:center;gap:8px;padding:16px}
-.streak-dot{width:32px;height:32px;border-radius:50%;background:#eee;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#999;position:relative;flex-direction:column;gap:0;transition:all .2s}
-.streak-dot.filled{background:linear-gradient(135deg,#e84444,#f5a623);color:#fff;box-shadow:0 2px 8px rgba(232,68,68,.35)}
-.streak-dot.today{box-shadow:0 0 0 3px #f5a623,0 2px 8px rgba(232,68,68,.3)}
-.streak-dot .dot-day{font-size:10px;line-height:1}
-.streak-dot .dot-icon{font-size:12px;line-height:1}
-.streak-count{text-align:center;padding:0 16px 16px;font-size:12px;color:#999}
-.streak-count span{color:#e84444;font-weight:700}
+.streak-wrap { padding: 16px 16px 4px; }
+.streak-dots { display: flex; gap: 6px; justify-content: center; }
+.streak-dot {
+  flex: 1; max-width: 36px; aspect-ratio: 1;
+  border-radius: 50%;
+  background: var(--border);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: 700; color: #bbb;
+  transition: all .25s;
+  position: relative;
+}
+.streak-dot.filled { background: var(--grad); color: #fff; box-shadow: 0 3px 10px rgba(232,68,68,.35); }
+.streak-dot.today { box-shadow: 0 0 0 3px var(--orange), 0 3px 10px rgba(232,68,68,.3); }
+.streak-dot.today:not(.filled) { color: var(--red); background: #fff; }
+.dot-n { font-size: 9px; line-height: 1.2; }
+.dot-e { font-size: 13px; line-height: 1; }
+.streak-stat { text-align: center; padding: 10px 16px 16px; font-size: 13px; color: var(--sub); }
+.streak-stat b { color: var(--red); }
 
-/* ── Nav tabs ── */
-.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:#fff;border-top:1px solid #eee;display:flex;padding-bottom:env(safe-area-inset-bottom);z-index:100}
-.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 0;border:none;background:none;cursor:pointer;color:#999;font-size:10px;font-weight:600}
-.nav-btn.active{color:#e84444}
-.nav-btn .nav-icon{font-size:22px}
+/* ── Reflection screen ── */
+.refl-screen { padding: 0; }
+.refl-header { background: var(--grad); padding: 20px 20px 24px; padding-top: calc(16px + var(--safe-t)); }
+.refl-header-title { color: #fff; font-size: 22px; font-weight: 800; }
+.refl-header-sub { color: rgba(255,255,255,.8); font-size: 14px; margin-top: 4px; }
+.refl-content { padding: 16px 16px 0; }
+.refl-group { margin-bottom: 14px; }
+.refl-group-label { font-size: 12px; font-weight: 700; color: var(--sub); letter-spacing: .4px; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+.refl-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.refl-dot.g { background: #34c759; }
+.refl-dot.b { background: #007aff; }
+.refl-dot.o { background: var(--orange); }
+.refl-items { background: var(--card); border-radius: var(--radius); overflow: hidden; box-shadow: 0 2px 12px rgba(0,0,0,.06); }
+.refl-item { display: flex; align-items: flex-start; padding: 14px 16px; gap: 10px; border-bottom: 1px solid var(--border); }
+.refl-item:last-child { border-bottom: none; }
+.refl-item-num { font-size: 13px; font-weight: 700; color: var(--sub); flex-shrink: 0; padding-top: 1px; }
+.refl-textarea {
+  flex: 1; border: none; background: transparent; font-size: 15px; color: var(--text);
+  resize: none; outline: none; font-family: inherit; line-height: 1.5; min-height: 24px;
+}
+.refl-textarea::placeholder { color: #ccc; }
+.refl-save-btn { width: 100%; padding: 16px; border-radius: 14px; border: none; background: var(--grad); color: #fff; font-size: 17px; font-weight: 700; cursor: pointer; margin: 16px 0; box-shadow: 0 4px 16px rgba(232,68,68,.3); }
+.refl-saved-wrap { background: var(--card); border-radius: var(--radius); padding: 14px 16px; text-align: center; margin-bottom: 14px; box-shadow: 0 2px 12px rgba(0,0,0,.06); }
+.refl-saved-badge { color: #34c759; font-size: 15px; font-weight: 700; }
+.refl-edit-btn { background: none; border: none; color: var(--sub); font-size: 13px; cursor: pointer; margin-top: 6px; text-decoration: underline; }
 
-/* ── Settings view ── */
-.settings-view{padding:20px 16px;padding-top:calc(20px + env(safe-area-inset-top))}
-.settings-title{font-size:20px;font-weight:800;margin-bottom:20px}
-.settings-card{background:#fff;border-radius:16px;padding:16px;box-shadow:0 2px 10px rgba(0,0,0,.06);margin-bottom:16px}
-.settings-card label{display:block;font-size:13px;color:#999;margin-bottom:8px;font-weight:600}
-.settings-card input[type=date]{width:100%;padding:12px;border-radius:10px;border:1px solid #eee;font-size:15px;color:#1a1a1a;background:#f7f7f7;outline:none}
-.settings-save-btn{width:100%;padding:14px;border-radius:12px;border:none;background:linear-gradient(135deg,#e84444,#f5a623);color:#fff;font-size:16px;font-weight:700;cursor:pointer;margin-top:8px}
-.settings-reset-btn{width:100%;padding:12px;border-radius:12px;border:2px solid #eee;background:#fff;color:#999;font-size:14px;font-weight:600;cursor:pointer;margin-top:8px}
+/* ── Settings screen ── */
+.settings-header { background: var(--grad); padding: 20px 20px 28px; padding-top: calc(16px + var(--safe-t)); }
+.settings-header-title { color: #fff; font-size: 22px; font-weight: 800; }
+.settings-content { padding: 16px; }
+.settings-card { background: var(--card); border-radius: var(--radius); padding: 16px; box-shadow: 0 2px 12px rgba(0,0,0,.06); margin-bottom: 14px; }
+.settings-label { font-size: 12px; font-weight: 700; color: var(--sub); letter-spacing: .4px; margin-bottom: 10px; }
+.settings-input { width: 100%; padding: 13px 14px; border-radius: 12px; border: 2px solid var(--border); font-size: 16px; color: var(--text); background: var(--bg); outline: none; font-family: inherit; }
+.settings-input:focus { border-color: var(--red); }
+.settings-save { width: 100%; padding: 14px; border-radius: 12px; border: none; background: var(--grad); color: #fff; font-size: 16px; font-weight: 700; cursor: pointer; margin-top: 10px; }
+.settings-reset { width: 100%; padding: 13px; border-radius: 12px; border: 2px solid var(--border); background: #fff; color: #ff3b30; font-size: 15px; font-weight: 600; cursor: pointer; }
 
-.hidden{display:none!important}
+/* ── Bottom nav ── */
+.bottom-nav {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  background: rgba(255,255,255,.95);
+  -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px);
+  border-top: 1px solid var(--border);
+  display: flex;
+  height: calc(var(--tab-h) + var(--safe-b));
+  padding-bottom: var(--safe-b);
+  z-index: 100;
+}
+.nav-tab { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; border: none; background: none; cursor: pointer; color: #aaa; font-size: 10px; font-weight: 600; letter-spacing: .2px; padding: 0; }
+.nav-tab.active { color: var(--red); }
+.nav-tab .ni { font-size: 24px; line-height: 1; }
+
+/* ── Utils ── */
+.hidden { display: none !important; }
 </style>
 </head>
 <body>
 
-<!-- Setup screen -->
+<!-- Setup -->
 <div id="setup-screen">
-  <div id="setup">
-    <h1>🔥 試合まで8日間</h1>
-    <p>試合日を設定してスタートしよう</p>
-    <label>試合日</label>
+  <div class="setup-logo">🔥</div>
+  <div class="setup-title">試合まで8日間</div>
+  <div class="setup-sub">試合日を設定してスタートしよう</div>
+  <div class="setup-card">
+    <label>試合日を選択</label>
     <input type="date" id="setup-date">
-    <button id="setup-start">スタート</button>
+    <button class="setup-start" id="setup-btn">スタートする →</button>
   </div>
 </div>
 
-<!-- Main app -->
-<div id="app-screen" class="hidden">
-  <div id="app"></div>
+<!-- App -->
+<div id="app-screen">
+
+  <!-- HOME -->
+  <div class="screen active" id="screen-home">
+    <div class="app-header" id="home-header"></div>
+    <div class="theme-card" id="theme-card"></div>
+    <div class="page-content" id="home-content"></div>
+  </div>
+
+  <!-- REFLECTION -->
+  <div class="screen refl-screen" id="screen-refl">
+    <div class="refl-header" id="refl-header"></div>
+    <div class="refl-content" id="refl-content"></div>
+  </div>
+
+  <!-- SETTINGS -->
+  <div class="screen" id="screen-settings">
+    <div class="settings-header"><div class="settings-header-title">⚙️ 設定</div></div>
+    <div class="settings-content">
+      <div class="settings-card">
+        <div class="settings-label">試合日</div>
+        <input type="date" class="settings-input" id="settings-date">
+        <button class="settings-save" id="settings-save-btn">保存する</button>
+      </div>
+      <div class="settings-card">
+        <div class="settings-label">リセット</div>
+        <button class="settings-reset" id="reset-btn">すべてのデータをリセット</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Nav -->
   <nav class="bottom-nav">
-    <button class="nav-btn active" data-tab="home">
-      <span class="nav-icon">🏠</span>ホーム
-    </button>
-    <button class="nav-btn" data-tab="settings">
-      <span class="nav-icon">⚙️</span>設定
-    </button>
+    <button class="nav-tab active" data-tab="home"><span class="ni">🏠</span>ホーム</button>
+    <button class="nav-tab" data-tab="refl"><span class="ni">🌙</span>振り返り</button>
+    <button class="nav-tab" data-tab="settings"><span class="ni">⚙️</span>設定</button>
   </nav>
 </div>
 
 <script>
-// ── Constants ──
-const LS_KEY = 'match8day_v1';
-const THEMES = [
-  '基礎を固める日',
-  '体を動かす日',
-  'イメトレをする日',
-  '弱点を克服する日',
-  'チームと連携する日',
-  'メンタルを整える日',
-  'コンディションを上げる日',
-  '本番のつもりで臨む日',
-];
-const FIXED_SCHEDULE_DEF = [
-  { id:'wake',   label:'起床',                    defaultTime:'08:00' },
-  { id:'jog',    label:'ジョギング',               defaultTime:'08:00〜08:30' },
-  { id:'clean',  label:'片付け',                   defaultTime:'08:30〜09:00' },
-  { id:'plan',   label:'やることリスト作成',        defaultTime:'09:00〜10:00' },
-  { id:'night',  label:'シャワー・夜ご飯・洗濯',   defaultTime:'21:00〜23:00' },
-  { id:'sleep',  label:'就寝',                     defaultTime:'23:00' },
+const LS = 'match8day_v2';
+const THEMES = ['基礎を固める日','体を動かす日','イメトレをする日','弱点を克服する日','チームと連携する日','メンタルを整える日','コンディションを上げる日','本番のつもりで臨む日'];
+const FIXED_DEF = [
+  { id:'wake',  label:'起床',                  def:'08:00' },
+  { id:'jog',   label:'ジョギング',             def:'08:30' },
+  { id:'clean', label:'片付け',                 def:'09:00' },
+  { id:'plan',  label:'やることリスト作成',      def:'10:00' },
+  { id:'night', label:'シャワー・夜ご飯・洗濯',  def:'21:00' },
+  { id:'sleep', label:'就寝',                   def:'23:00' },
 ];
 
-// ── State ──
 let state = {};
-let currentTab = 'home';
+let tab = 'home';
+let reflEditMode = false;
 
+// ── storage ──
+function load() { try { state = JSON.parse(localStorage.getItem(LS)) || {}; } catch { state = {}; } }
+function save() { localStorage.setItem(LS, JSON.stringify(state)); }
+
+// ── date utils ──
 function todayStr() {
   const d = new Date();
-  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  return `${d.getFullYear()}-${p2(d.getMonth()+1)}-${p2(d.getDate())}`;
 }
-
-function loadState() {
-  try { state = JSON.parse(localStorage.getItem(LS_KEY)) || {}; } catch(e) { state = {}; }
+function p2(n) { return String(n).padStart(2,'0'); }
+function parseLocal(s) { const [y,m,d] = s.split('-').map(Number); return new Date(y,m-1,d); }
+function dStr(d) { return `${d.getFullYear()}-${p2(d.getMonth()+1)}-${p2(d.getDate())}`; }
+function jaDate(s) {
+  const d = parseLocal(s);
+  const w = ['日','月','火','水','木','金','土'][d.getDay()];
+  return `${d.getMonth()+1}月${d.getDate()}日（${w}）`;
 }
-function saveState() {
-  localStorage.setItem(LS_KEY, JSON.stringify(state));
+function daysLeft() {
+  const today = parseLocal(todayStr());
+  const match = parseLocal(state.matchDate);
+  return Math.ceil((match - today) / 86400000);
 }
-
-function getDayState(dateStr) {
+function dayIdx() {
+  if (!state.startDate) return 1;
+  const diff = Math.ceil((parseLocal(todayStr()) - parseLocal(state.startDate)) / 86400000);
+  return Math.max(1, Math.min(8, diff + 1));
+}
+function startFrom(matchStr) {
+  const m = parseLocal(matchStr);
+  m.setDate(m.getDate() - 7);
+  return dStr(m);
+}
+function get8Days() {
+  if (!state.startDate) return [];
+  const s = parseLocal(state.startDate);
+  return Array.from({length:8}, (_,i) => { const d = new Date(s); d.setDate(d.getDate()+i); return dStr(d); });
+}
+function dayState(dateStr) {
   if (!state.days) state.days = {};
   if (!state.days[dateStr]) state.days[dateStr] = {};
   const d = state.days[dateStr];
@@ -197,380 +340,350 @@ function getDayState(dateStr) {
   if (!d.fixedDone) d.fixedDone = {};
   if (!d.freeBlocks) d.freeBlocks = [];
   if (!d.todos) d.todos = [];
-  if (!d.reflection) d.reflection = { done1:'', done2:'', done3:'', anxiety:'', tomorrow:'' };
-  if (d.reflectionSaved === undefined) d.reflectionSaved = false;
+  if (!d.refl) d.refl = { done1:'',done2:'',done3:'',anxiety:'',tomorrow:'' };
+  if (d.reflSaved === undefined) d.reflSaved = false;
   return d;
 }
 
-// ── Date utils ──
-function parseLocalDate(str) {
-  const [y,m,d] = str.split('-').map(Number);
-  return new Date(y, m-1, d);
-}
-function dateStr(d) {
-  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-}
-function formatDateJa(str) {
-  const d = parseLocalDate(str);
-  const w = ['日','月','火','水','木','金','土'][d.getDay()];
-  return `${d.getMonth()+1}月${d.getDate()}日（${w}）`;
-}
-function daysUntil(targetStr) {
-  const today = parseLocalDate(todayStr());
-  const target = parseLocalDate(targetStr);
-  return Math.ceil((target - today) / 86400000);
-}
-function dayIndex() {
-  // Day 1 = startDate, Day 8 = matchDate
-  if (!state.startDate) return 1;
-  const start = parseLocalDate(state.startDate);
-  const today = parseLocalDate(todayStr());
-  const diff = Math.ceil((today - start) / 86400000);
-  return Math.max(1, Math.min(8, diff + 1));
-}
-function getStartDate(matchDateStr) {
-  const match = parseLocalDate(matchDateStr);
-  const start = new Date(match);
-  start.setDate(start.getDate() - 7);
-  return dateStr(start);
-}
-function get8Days() {
-  if (!state.startDate) return [];
-  const start = parseLocalDate(state.startDate);
-  return Array.from({length:8}, (_,i) => {
-    const d = new Date(start);
-    d.setDate(d.getDate() + i);
-    return dateStr(d);
-  });
-}
-
-// ── Render ──
-function render() {
-  if (!state.matchDate) { showSetup(); return; }
-  showApp();
-  if (currentTab === 'home') renderHome();
-  else renderSettings();
-}
-
-function showSetup() {
-  document.getElementById('setup-screen').classList.remove('hidden');
-  document.getElementById('app-screen').classList.add('hidden');
-  // default to 8 days from today
-  const def = new Date(); def.setDate(def.getDate() + 8);
-  document.getElementById('setup-date').value = dateStr(def);
-}
-function showApp() {
-  document.getElementById('setup-screen').classList.add('hidden');
-  document.getElementById('app-screen').classList.remove('hidden');
-}
-
+// ── render home ──
 function renderHome() {
   const today = todayStr();
-  const d = getDayState(today);
-  const left = daysUntil(state.matchDate);
-  const dayN = dayIndex();
-  const theme = THEMES[Math.min(dayN-1, 7)];
-  const days8 = get8Days();
+  const d = dayState(today);
+  const left = Math.max(0, daysLeft());
+  const n = dayIdx();
+  const theme = THEMES[Math.min(n-1, 7)];
 
-  let html = `
-  <div class="app-header">
-    <div class="date-label">TODAY</div>
-    <div class="date-main">${formatDateJa(today)}</div>
-    <div class="countdown-row">
-      <span class="countdown-num">${Math.max(0,left)}</span>
-      <span class="countdown-unit">日後</span>
+  // header
+  document.getElementById('home-header').innerHTML = `
+    <div class="header-top">
+      <div>
+        <div class="header-date-label">TODAY</div>
+        <div class="header-date">${jaDate(today)}</div>
+      </div>
+      <div class="header-day-badge">DAY ${n} / 8</div>
     </div>
-    <div class="countdown-match">試合: ${formatDateJa(state.matchDate)}</div>
-  </div>
+    <div class="countdown-row">
+      <span class="countdown-num">${left}</span>
+      <span class="countdown-unit"> 日後</span>
+    </div>
+    <div class="countdown-match">試合: ${jaDate(state.matchDate)}</div>`;
 
-  <div class="theme-banner">
-    <div class="theme-day">DAY ${dayN} / 8</div>
-    <div class="theme-text">${theme}</div>
-  </div>
-  `;
+  // theme
+  const themeIcons = ['🏃','💪','🧠','⚡','🤝','🧘','🔥','🏆'];
+  document.getElementById('theme-card').innerHTML = `
+    <div class="theme-icon">${themeIcons[n-1]}</div>
+    <div><div class="theme-day-label">TODAY'S THEME</div><div class="theme-text">${theme}</div></div>`;
 
-  // ── Fixed schedule ──
-  html += `<div class="section" style="margin-top:16px">
-    <div class="section-header"><span class="section-icon">📋</span><span class="section-title">固定スケジュール</span></div>`;
-  FIXED_SCHEDULE_DEF.forEach(item => {
-    const time = d.fixedTimes[item.id] || item.defaultTime;
-    const done = !!d.fixedDone[item.id];
-    html += `<div class="sched-item${done?' done':''}">
-      <div class="sched-check${done?' done':''}" data-action="toggle-fixed" data-id="${item.id}"></div>
-      <div class="sched-time"><input type="text" value="${time}" data-action="edit-fixed-time" data-id="${item.id}" inputmode="text"></div>
-      <div class="sched-label">${item.label}</div>
+  // content
+  let html = '';
+
+  // fixed schedule
+  const fixedDone = FIXED_DEF.filter(f => d.fixedDone[f.id]).length;
+  html += `<div class="scard">
+    <div class="scard-header">
+      <span class="scard-icon">📋</span>
+      <span class="scard-title">固定スケジュール</span>
+      <span class="scard-badge">${fixedDone}/${FIXED_DEF.length}</span>
+    </div>`;
+  FIXED_DEF.forEach(f => {
+    const done = !!d.fixedDone[f.id];
+    const time = d.fixedTimes[f.id] || f.def;
+    html += `<div class="sched-row${done?' done':''}">
+      <div class="check-circle${done?' on':''}" data-a="fx-check" data-id="${f.id}"></div>
+      <div class="sched-time-wrap">
+        <input class="time-pill" type="time" value="${time}" data-a="fx-time" data-id="${f.id}">
+      </div>
+      <div class="sched-label">${f.label}</div>
     </div>`;
   });
   html += `</div>`;
 
-  // ── Free zone ──
-  html += `<div class="section" style="margin-top:10px">
-    <div class="section-header"><span class="section-icon">🕐</span><span class="section-title">自由スケジュール（9:00〜21:00）</span></div>`;
+  // free blocks
+  html += `<div class="scard">
+    <div class="scard-header">
+      <span class="scard-icon">🕐</span>
+      <span class="scard-title">自由スケジュール</span>
+      <span style="font-size:11px;color:var(--sub)">9:00〜21:00</span>
+    </div>`;
   d.freeBlocks.forEach((blk, i) => {
     const done = !!blk.done;
-    html += `<div class="free-item${done?' done':''}">
-      <div class="sched-check${done?' done':''}" data-action="toggle-free" data-i="${i}"></div>
-      <input class="free-time" type="text" placeholder="時間" value="${blk.time||''}" data-action="edit-free-time" data-i="${i}" inputmode="text">
-      <input class="free-label" type="text" placeholder="やること" value="${blk.label||''}" data-action="edit-free-label" data-i="${i}">
-      <button class="free-del" data-action="del-free" data-i="${i}">×</button>
+    html += `<div class="free-row${done?' done':''}">
+      <div class="check-circle${done?' on':''}" data-a="free-check" data-i="${i}"></div>
+      <div class="free-times">
+        <input class="free-time-input" type="time" value="${blk.start||''}" data-a="free-start" data-i="${i}">
+        <span class="time-sep">〜</span>
+        <input class="free-time-input" type="time" value="${blk.end||''}" data-a="free-end" data-i="${i}">
+      </div>
+      <input class="free-label-input" type="text" value="${esc(blk.label||'')}" placeholder="やること" data-a="free-label" data-i="${i}">
+      <button class="del-btn" data-a="free-del" data-i="${i}">×</button>
     </div>`;
   });
-  html += `<button class="add-free-btn" data-action="add-free">自由ブロックを追加</button>
+  html += `<button class="add-block-btn" data-a="add-free">＋ ブロックを追加</button>
   </div>`;
 
-  // ── Todo list ──
-  html += `<div class="section" style="margin-top:10px">
-    <div class="section-header"><span class="section-icon">✅</span><span class="section-title">やることリスト</span></div>`;
-  d.todos.forEach((todo, i) => {
-    const done = !!todo.done;
-    html += `<div class="todo-item">
-      <div class="todo-check${done?' done':''}" data-action="toggle-todo" data-i="${i}"></div>
-      <input class="todo-text${done?' done':''}" type="text" value="${esc(todo.text||'')}" data-action="edit-todo" data-i="${i}" placeholder="タスク">
-      <button class="todo-del" data-action="del-todo" data-i="${i}">×</button>
+  // todo
+  const todoDone = d.todos.filter(t=>t.done).length;
+  html += `<div class="scard">
+    <div class="scard-header">
+      <span class="scard-icon">✅</span>
+      <span class="scard-title">やることリスト</span>
+      <span class="scard-badge">${todoDone}/${d.todos.length}</span>
+    </div>`;
+  d.todos.forEach((t, i) => {
+    const done = !!t.done;
+    html += `<div class="todo-row${done?' done':''}">
+      <div class="check-sq${done?' on':''}" data-a="todo-check" data-i="${i}"></div>
+      <input class="todo-input-field${done?' done':''}" type="text" value="${esc(t.text||'')}" data-a="todo-text" data-i="${i}">
+      <button class="del-btn" data-a="todo-del" data-i="${i}">×</button>
     </div>`;
   });
-  html += `<div class="todo-add-row">
-    <input class="todo-input" id="todo-new-input" type="text" placeholder="新しいタスクを追加..." inputmode="text">
-    <button class="todo-add-btn" data-action="add-todo">追加</button>
-  </div>
-  </div>`;
+  html += `<div class="todo-add-wrap">
+    <input class="todo-new-input" id="todo-input" type="text" placeholder="タスクを追加..." inputmode="text">
+    <button class="add-btn" data-a="todo-add">追加</button>
+  </div></div>`;
 
-  // ── Reflection ──
-  const r = d.reflection;
-  const saved = d.reflectionSaved;
-  html += `<div class="section" style="margin-top:10px">
-    <div class="section-header"><span class="section-icon">🌙</span><span class="section-title">夜の振り返り</span></div>
-    <div class="refl-row">
-      <div class="refl-label"><span class="refl-dot green"></span>今日できたこと① </div>
-      <textarea class="refl-input" rows="1" data-action="edit-refl" data-key="done1" placeholder="できたこと...">${esc(r.done1||'')}</textarea>
-    </div>
-    <div class="refl-row">
-      <div class="refl-label"><span class="refl-dot green"></span>今日できたこと②</div>
-      <textarea class="refl-input" rows="1" data-action="edit-refl" data-key="done2" placeholder="できたこと...">${esc(r.done2||'')}</textarea>
-    </div>
-    <div class="refl-row">
-      <div class="refl-label"><span class="refl-dot green"></span>今日できたこと③</div>
-      <textarea class="refl-input" rows="1" data-action="edit-refl" data-key="done3" placeholder="できたこと...">${esc(r.done3||'')}</textarea>
-    </div>
-    <div class="refl-row">
-      <div class="refl-label"><span class="refl-dot blue"></span>不安だったこと</div>
-      <textarea class="refl-input" rows="1" data-action="edit-refl" data-key="anxiety" placeholder="不安なこと...">${esc(r.anxiety||'')}</textarea>
-    </div>
-    <div class="refl-row">
-      <div class="refl-label"><span class="refl-dot orange"></span>明日やること</div>
-      <textarea class="refl-input" rows="1" data-action="edit-refl" data-key="tomorrow" placeholder="明日の目標...">${esc(r.tomorrow||'')}</textarea>
-    </div>
-    ${saved
-      ? `<div class="refl-saved-badge">✅ 振り返り保存済み</div>
-         <button class="refl-save-btn" style="background:#eee;color:#999;box-shadow:none" data-action="save-refl">再保存する</button>`
-      : `<button class="refl-save-btn" data-action="save-refl">振り返りを保存</button>`
-    }
-  </div>`;
-
-  // ── Streak ──
-  html += `<div class="section" style="margin-top:10px">
-    <div class="section-header"><span class="section-icon">🔥</span><span class="section-title">継続ゲージ</span></div>
-    <div class="streak-row">`;
+  // streak
+  const days8 = get8Days();
+  const filledN = days8.filter(ds => state.days?.[ds]?.reflSaved).length;
+  html += `<div class="scard"><div class="scard-header"><span class="scard-icon">🔥</span><span class="scard-title">継続ゲージ</span></div>
+  <div class="streak-wrap"><div class="streak-dots">`;
   days8.forEach((ds, i) => {
-    const dState = state.days?.[ds] || {};
-    const filled = !!dState.reflectionSaved;
+    const filled = !!state.days?.[ds]?.reflSaved;
     const isToday = ds === today;
     html += `<div class="streak-dot${filled?' filled':''}${isToday?' today':''}">
-      <span class="dot-day">${i+1}</span>
-      <span class="dot-icon">${filled?'🔥':'　'}</span>
+      <span class="dot-n">${i+1}</span>
+      <span class="dot-e">${filled?'🔥':'·'}</span>
     </div>`;
   });
-  const filledCount = days8.filter(ds => state.days?.[ds]?.reflectionSaved).length;
-  html += `</div><div class="streak-count"><span>${filledCount}</span> / 8日 振り返り完了</div></div>`;
+  html += `</div></div><div class="streak-stat"><b>${filledN}</b> / 8日 振り返り完了</div></div>`;
 
-  html += `<div style="height:24px"></div>`;
-
-  document.getElementById('app').innerHTML = html;
-  restoreFocus();
+  document.getElementById('home-content').innerHTML = html;
 }
 
-function renderSettings() {
-  document.getElementById('app').innerHTML = `
-  <div class="settings-view">
-    <div class="settings-title">⚙️ 設定</div>
-    <div class="settings-card">
-      <label>試合日</label>
-      <input type="date" id="settings-match-date" value="${state.matchDate||''}">
-      <button class="settings-save-btn" data-action="save-settings">保存する</button>
-    </div>
-    <div class="settings-card">
-      <label>リセット</label>
-      <button class="settings-reset-btn" data-action="reset-all">すべてのデータをリセット</button>
+// ── render reflection ──
+function renderRefl() {
+  const today = todayStr();
+  const d = dayState(today);
+  const r = d.refl;
+  const saved = d.reflSaved;
+
+  document.getElementById('refl-header').innerHTML = `
+    <div class="refl-header-title">🌙 夜の振り返り</div>
+    <div class="refl-header-sub">${jaDate(today)}</div>`;
+
+  const ro = saved && !reflEditMode;
+  const val = (v) => esc(r[v]||'');
+  const placeholder = { done1:'できたこと①', done2:'できたこと②', done3:'できたこと③', anxiety:'不安なこと', tomorrow:'明日の目標' };
+
+  let html = '';
+
+  // できたこと
+  html += `<div class="refl-group">
+    <div class="refl-group-label"><span class="refl-dot g"></span>今日できたこと</div>
+    <div class="refl-items">`;
+  ['done1','done2','done3'].forEach((k,i) => {
+    html += `<div class="refl-item">
+      <span class="refl-item-num">${i+1}</span>
+      <textarea class="refl-textarea" data-k="${k}" placeholder="${placeholder[k]}" rows="1"${ro?' readonly':''}>${val(k)}</textarea>
+    </div>`;
+  });
+  html += `</div></div>`;
+
+  // 不安
+  html += `<div class="refl-group">
+    <div class="refl-group-label"><span class="refl-dot b"></span>不安だったこと</div>
+    <div class="refl-items">
+      <div class="refl-item">
+        <textarea class="refl-textarea" data-k="anxiety" placeholder="${placeholder.anxiety}" rows="1"${ro?' readonly':''}>${val('anxiety')}</textarea>
+      </div>
     </div>
   </div>`;
+
+  // 明日
+  html += `<div class="refl-group">
+    <div class="refl-group-label"><span class="refl-dot o"></span>明日やること</div>
+    <div class="refl-items">
+      <div class="refl-item">
+        <textarea class="refl-textarea" data-k="tomorrow" placeholder="${placeholder.tomorrow}" rows="1"${ro?' readonly':''}>${val('tomorrow')}</textarea>
+      </div>
+    </div>
+  </div>`;
+
+  if (saved && !reflEditMode) {
+    html += `<div class="refl-saved-wrap">
+      <div class="refl-saved-badge">✅ 振り返り保存済み</div>
+      <button class="refl-edit-btn" id="refl-edit-btn">編集する</button>
+    </div>`;
+  } else {
+    html += `<button class="refl-save-btn" id="refl-save-btn">${saved?'再保存する':'振り返りを保存'}</button>`;
+  }
+
+  document.getElementById('refl-content').innerHTML = html;
+
+  // auto-resize textareas
+  document.querySelectorAll('.refl-textarea').forEach(ta => {
+    ta.style.height = 'auto';
+    ta.style.height = ta.scrollHeight + 'px';
+    ta.addEventListener('input', () => {
+      ta.style.height = 'auto';
+      ta.style.height = ta.scrollHeight + 'px';
+    });
+  });
+
+  document.getElementById('refl-save-btn')?.addEventListener('click', () => {
+    d.reflSaved = true;
+    reflEditMode = false;
+    save();
+    renderRefl();
+  });
+  document.getElementById('refl-edit-btn')?.addEventListener('click', () => {
+    reflEditMode = true;
+    renderRefl();
+  });
+
+  document.querySelectorAll('.refl-textarea').forEach(ta => {
+    ta.addEventListener('input', () => {
+      d.refl[ta.dataset.k] = ta.value;
+      save();
+    });
+  });
+}
+
+// ── render ──
+function render() {
+  if (!state.matchDate) { showSetup(); return; }
+  hideSetup();
+  if (tab === 'home') renderHome();
+  else if (tab === 'refl') renderRefl();
+  else if (tab === 'settings') {
+    document.getElementById('settings-date').value = state.matchDate;
+  }
+}
+
+function showSetup() {
+  document.getElementById('setup-screen').style.display = 'flex';
+  document.getElementById('app-screen').classList.remove('show');
+  const def = new Date(); def.setDate(def.getDate()+8);
+  document.getElementById('setup-date').value = dStr(def);
+}
+function hideSetup() {
+  document.getElementById('setup-screen').style.display = 'none';
+  document.getElementById('app-screen').classList.add('show');
+}
+function switchTab(t) {
+  tab = t;
+  document.querySelectorAll('.nav-tab').forEach(b => b.classList.toggle('active', b.dataset.tab===t));
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(`screen-${t}`).classList.add('active');
+  render();
 }
 
 function esc(s) {
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
-// ── Focus management ──
-let _focusedAction = null, _focusedExtra = null, _focusedSel = null;
-function captureFocus() {
-  const el = document.activeElement;
-  if (!el || el === document.body) { _focusedAction=null; return; }
-  _focusedAction = el.dataset.action || null;
-  _focusedExtra = el.dataset.i || el.dataset.id || el.dataset.key || null;
-  _focusedSel = [el.selectionStart, el.selectionEnd];
-}
-function restoreFocus() {
-  if (!_focusedAction) return;
-  const sel = `[data-action="${_focusedAction}"]`;
-  const extra = _focusedExtra;
-  const candidates = document.querySelectorAll(sel);
-  let el = null;
-  candidates.forEach(c => {
-    const v = c.dataset.i || c.dataset.id || c.dataset.key;
-    if (v === extra) el = c;
-  });
-  if (!el && candidates.length === 1) el = candidates[0];
-  if (el) {
-    el.focus();
-    try { el.setSelectionRange(_focusedSel[0], _focusedSel[1]); } catch(e){}
-  }
-}
-
-// ── Event delegation ──
-document.getElementById('app').addEventListener('input', e => {
-  const el = e.target;
-  const action = el.dataset.action;
-  if (!action) return;
-  captureFocus();
-  const today = todayStr();
-  const d = getDayState(today);
-
-  if (action === 'edit-fixed-time') {
-    d.fixedTimes[el.dataset.id] = el.value;
-    saveState();
-  }
-  else if (action === 'edit-free-time') {
-    d.freeBlocks[+el.dataset.i].time = el.value;
-    saveState();
-  }
-  else if (action === 'edit-free-label') {
-    d.freeBlocks[+el.dataset.i].label = el.value;
-    saveState();
-  }
-  else if (action === 'edit-todo') {
-    d.todos[+el.dataset.i].text = el.value;
-    saveState();
-  }
-  else if (action === 'edit-refl') {
-    d.reflection[el.dataset.key] = el.value;
-    saveState();
-  }
-});
-
-document.getElementById('app').addEventListener('click', e => {
-  const el = e.target.closest('[data-action]');
+// ── Home events ──
+document.getElementById('home-content').addEventListener('click', e => {
+  const el = e.target.closest('[data-a]');
   if (!el) return;
-  const action = el.dataset.action;
+  const a = el.dataset.a;
   const today = todayStr();
-  const d = getDayState(today);
+  const d = dayState(today);
 
-  if (action === 'toggle-fixed') {
+  if (a === 'fx-check') {
     d.fixedDone[el.dataset.id] = !d.fixedDone[el.dataset.id];
-    saveState(); captureFocus(); renderHome();
-  }
-  else if (action === 'toggle-free') {
-    const i = +el.dataset.i;
-    d.freeBlocks[i].done = !d.freeBlocks[i].done;
-    saveState(); captureFocus(); renderHome();
-  }
-  else if (action === 'del-free') {
+    save(); renderHome();
+  } else if (a === 'free-check') {
+    d.freeBlocks[+el.dataset.i].done = !d.freeBlocks[+el.dataset.i].done;
+    save(); renderHome();
+  } else if (a === 'free-del') {
     d.freeBlocks.splice(+el.dataset.i, 1);
-    saveState(); renderHome();
-  }
-  else if (action === 'add-free') {
-    d.freeBlocks.push({ time:'', label:'', done:false });
-    saveState(); renderHome();
-    // focus new time input
+    save(); renderHome();
+  } else if (a === 'add-free') {
+    d.freeBlocks.push({ start:'', end:'', label:'', done:false });
+    save(); renderHome();
     setTimeout(() => {
-      const inputs = document.querySelectorAll('[data-action="edit-free-time"]');
-      if (inputs.length) inputs[inputs.length-1].focus();
-    }, 50);
-  }
-  else if (action === 'toggle-todo') {
-    const i = +el.dataset.i;
-    d.todos[i].done = !d.todos[i].done;
-    saveState(); captureFocus(); renderHome();
-  }
-  else if (action === 'del-todo') {
+      const ins = document.querySelectorAll('[data-a="free-start"]');
+      if (ins.length) ins[ins.length-1].focus();
+    }, 60);
+  } else if (a === 'todo-check') {
+    d.todos[+el.dataset.i].done = !d.todos[+el.dataset.i].done;
+    save(); renderHome();
+  } else if (a === 'todo-del') {
     d.todos.splice(+el.dataset.i, 1);
-    saveState(); renderHome();
-  }
-  else if (action === 'add-todo') {
+    save(); renderHome();
+  } else if (a === 'todo-add') {
     addTodo();
-  }
-  else if (action === 'save-refl') {
-    d.reflectionSaved = true;
-    saveState(); renderHome();
-  }
-  else if (action === 'save-settings') {
-    const val = document.getElementById('settings-match-date').value;
-    if (!val) return;
-    state.matchDate = val;
-    state.startDate = getStartDate(val);
-    saveState(); currentTab='home'; render();
-  }
-  else if (action === 'reset-all') {
-    if (confirm('すべてのデータをリセットしますか？')) {
-      localStorage.removeItem(LS_KEY);
-      state = {};
-      render();
-    }
   }
 });
 
-document.getElementById('app').addEventListener('keydown', e => {
-  if (e.key === 'Enter' && e.target.id === 'todo-new-input') {
-    e.preventDefault();
-    addTodo();
-  }
+document.getElementById('home-content').addEventListener('change', e => {
+  const el = e.target;
+  const a = el.dataset.a;
+  if (!a) return;
+  const d = dayState(todayStr());
+  if (a === 'fx-time') { d.fixedTimes[el.dataset.id] = el.value; save(); }
+  else if (a === 'free-start') { d.freeBlocks[+el.dataset.i].start = el.value; save(); }
+  else if (a === 'free-end') { d.freeBlocks[+el.dataset.i].end = el.value; save(); }
+});
+
+document.getElementById('home-content').addEventListener('input', e => {
+  const el = e.target;
+  const a = el.dataset.a;
+  if (!a) return;
+  const d = dayState(todayStr());
+  if (a === 'free-label') { d.freeBlocks[+el.dataset.i].label = el.value; save(); }
+  else if (a === 'todo-text') { d.todos[+el.dataset.i].text = el.value; save(); }
+});
+
+document.getElementById('home-content').addEventListener('keydown', e => {
+  if (e.key === 'Enter' && e.target.id === 'todo-input') { e.preventDefault(); addTodo(); }
 });
 
 function addTodo() {
-  const input = document.getElementById('todo-new-input');
-  if (!input) return;
-  const text = input.value.trim();
+  const inp = document.getElementById('todo-input');
+  if (!inp) return;
+  const text = inp.value.trim();
   if (!text) return;
-  const d = getDayState(todayStr());
-  d.todos.push({ text, done: false });
-  saveState();
-  renderHome();
-  setTimeout(() => {
-    const el = document.getElementById('todo-new-input');
-    if (el) el.focus();
-  }, 50);
+  const d = dayState(todayStr());
+  d.todos.push({ text, done:false });
+  save(); renderHome();
+  setTimeout(() => { const el = document.getElementById('todo-input'); if (el) el.focus(); }, 60);
 }
 
-// ── Nav tabs ──
-document.querySelectorAll('.nav-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    currentTab = btn.dataset.tab;
-    document.querySelectorAll('.nav-btn').forEach(b => b.classList.toggle('active', b === btn));
+// ── Nav ──
+document.querySelectorAll('.nav-tab').forEach(btn => {
+  btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+});
+
+// ── Settings ──
+document.getElementById('settings-save-btn').addEventListener('click', () => {
+  const v = document.getElementById('settings-date').value;
+  if (!v) return;
+  state.matchDate = v;
+  state.startDate = startFrom(v);
+  save(); switchTab('home');
+});
+document.getElementById('reset-btn').addEventListener('click', () => {
+  if (confirm('すべてのデータをリセットしますか？')) {
+    localStorage.removeItem(LS);
+    state = {};
     render();
-  });
+  }
 });
 
 // ── Setup ──
-document.getElementById('setup-start').addEventListener('click', () => {
-  const val = document.getElementById('setup-date').value;
-  if (!val) return;
-  state.matchDate = val;
-  state.startDate = getStartDate(val);
-  saveState();
-  render();
+document.getElementById('setup-btn').addEventListener('click', () => {
+  const v = document.getElementById('setup-date').value;
+  if (!v) return;
+  state.matchDate = v;
+  state.startDate = startFrom(v);
+  save(); render();
 });
 
 // ── Init ──
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js');
-loadState();
+load();
 render();
 </script>
 </body>
