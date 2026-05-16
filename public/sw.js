@@ -1,4 +1,4 @@
-const CACHE = 'match8day-v3';
+const CACHE = 'match8day-v4';
 const ASSETS = ['/', '/index.html', '/manifest.json'];
 
 self.addEventListener('install', e => {

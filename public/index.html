@@ -8,347 +8,321 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="8日間">
 <meta name="theme-color" content="#F2F2F7">
+<link rel="apple-touch-icon" href="/icon-192.png">
 <link rel="manifest" href="/manifest.json">
 <title>試合まで8日間</title>
 <style>
 :root {
-  --bg:        #F2F2F7;
-  --card:      #FFFFFF;
-  --sep:       #E5E5EA;
-  --sep2:      #F2F2F7;
-  --text:      #1C1C1E;
-  --sub:       #8E8E93;
-  --sub2:      #AEAEB2;
-  --accent:    #FF3B30;
-  --accent2:   #FF6B6B;
-  --fill:      #F2F2F7;
-  --fill2:     #E5E5EA;
-  --done-op:   0.28;
-  --r:         12px;
-  --r-sm:      8px;
-  --safe-t:    env(safe-area-inset-top, 0px);
-  --safe-b:    env(safe-area-inset-bottom, 0px);
-  --tab-h:     56px;
+  --bg:       #F2F2F7;
+  --card:     #FFFFFF;
+  --card-fx:  #F7F7FA;
+  --sep:      rgba(60,60,67,.12);
+  --text:     #1C1C1E;
+  --sub:      #8E8E93;
+  --sub2:     #C7C7CC;
+  --accent:   #FF3B30;
+  --navy:     #1C2B4A;
+  --blue:     #007AFF;
+  --green:    #34C759;
+  --orange:   #FF9500;
+  --done-op:  0.3;
+  --r:        14px;
+  --r-sm:     9px;
+  --safe-t:   env(safe-area-inset-top,0px);
+  --safe-b:   env(safe-area-inset-bottom,0px);
 }
-* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-html, body { height: 100%; }
-body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Helvetica Neue', sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  -webkit-font-smoothing: antialiased;
-}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans',sans-serif;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
 
 /* ── SETUP ── */
-#setup-screen {
-  position: fixed; inset: 0; z-index: 200;
-  background: var(--bg);
-  display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
-  padding: 40px 28px;
-  padding-top: calc(40px + var(--safe-t));
+#setup-screen{
+  position:fixed;inset:0;z-index:200;background:var(--bg);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:40px 28px;padding-top:calc(40px + var(--safe-t));
 }
-.setup-icon { font-size: 56px; margin-bottom: 24px; }
-.setup-h { font-size: 28px; font-weight: 700; color: var(--text); letter-spacing: -.5px; margin-bottom: 6px; }
-.setup-p { font-size: 15px; color: var(--sub); margin-bottom: 44px; }
-.setup-form { width: 100%; max-width: 340px; }
-.setup-label { font-size: 12px; font-weight: 600; color: var(--sub); letter-spacing: .4px; text-transform: uppercase; margin-bottom: 8px; display: block; }
-.setup-date-input {
-  width: 100%; padding: 14px 16px; border-radius: var(--r);
-  border: 1.5px solid var(--sep); background: var(--card);
-  font-size: 17px; color: var(--text); outline: none; font-family: inherit; margin-bottom: 16px;
+.su-icon{width:96px;height:96px;border-radius:22px;margin-bottom:28px;box-shadow:0 8px 28px rgba(0,0,0,.15)}
+.su-h{font-size:26px;font-weight:700;color:var(--text);letter-spacing:-.5px;margin-bottom:6px}
+.su-p{font-size:15px;color:var(--sub);margin-bottom:40px}
+.su-form{width:100%;max-width:340px}
+.su-lbl{font-size:11px;font-weight:600;color:var(--sub);letter-spacing:.5px;text-transform:uppercase;display:block;margin-bottom:8px}
+.su-input{
+  width:100%;padding:14px 16px;border-radius:var(--r);
+  border:1.5px solid var(--sep);background:var(--card);
+  font-size:17px;color:var(--text);outline:none;font-family:inherit;margin-bottom:14px;
 }
-.setup-date-input:focus { border-color: var(--accent); }
-.setup-btn {
-  width: 100%; padding: 16px; border-radius: var(--r);
-  background: var(--accent); border: none;
-  color: #fff; font-size: 17px; font-weight: 600; cursor: pointer; font-family: inherit;
+.su-input:focus{border-color:var(--accent)}
+.su-btn{
+  width:100%;padding:16px;border-radius:var(--r);background:var(--accent);
+  border:none;color:#fff;font-size:17px;font-weight:600;cursor:pointer;font-family:inherit;
 }
 
 /* ── APP SHELL ── */
-#app-screen { display: none; min-height: 100vh; }
-#app-screen.show { display: block; }
-.screen { display: none; min-height: 100vh; padding-bottom: calc(var(--tab-h) + var(--safe-b) + 8px); }
-.screen.active { display: block; }
+#app-screen{display:none;min-height:100vh}
+#app-screen.show{display:block}
+.screen{display:none;min-height:100vh;padding-bottom:calc(56px + var(--safe-b) + 12px)}
+.screen.active{display:block}
 
-/* ── PAGE HEADER (home) ── */
-.home-header {
-  background: var(--card);
-  padding: 16px 20px 20px;
-  padding-top: calc(16px + var(--safe-t));
-  border-bottom: 1px solid var(--sep);
+/* ── HOME HEADER ── */
+.home-hdr{
+  background:var(--card);
+  padding:16px 20px 18px;
+  padding-top:calc(14px + var(--safe-t));
+  border-bottom:.5px solid var(--sep);
 }
-.hdr-row1 { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
-.hdr-date-label { font-size: 11px; font-weight: 600; color: var(--sub); letter-spacing: .8px; text-transform: uppercase; margin-bottom: 3px; }
-.hdr-date { font-size: 20px; font-weight: 700; color: var(--text); letter-spacing: -.3px; }
-.day-pill {
-  background: var(--fill); border-radius: 20px;
-  padding: 5px 12px; font-size: 12px; font-weight: 600; color: var(--sub);
-  white-space: nowrap;
-}
-.countdown-block { display: flex; align-items: baseline; gap: 4px; }
-.count-num { font-size: 52px; font-weight: 800; color: var(--text); line-height: 1; letter-spacing: -2px; }
-.count-unit { font-size: 17px; font-weight: 500; color: var(--sub); }
-.count-sub { font-size: 13px; color: var(--sub2); margin-top: 4px; }
+.hdr-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px}
+.hdr-date-lbl{font-size:10px;font-weight:700;color:var(--sub);letter-spacing:1px;text-transform:uppercase;margin-bottom:2px}
+.hdr-date{font-size:19px;font-weight:700;color:var(--text);letter-spacing:-.3px}
+.day-pill{background:var(--bg);border-radius:20px;padding:5px 13px;font-size:12px;font-weight:600;color:var(--sub)}
+.cnt-row{display:flex;align-items:baseline;gap:3px}
+.cnt-n{font-size:56px;font-weight:800;color:var(--text);line-height:1;letter-spacing:-3px}
+.cnt-u{font-size:17px;font-weight:500;color:var(--sub)}
+.cnt-s{font-size:12px;color:var(--sub2);margin-top:4px}
 
-/* ── THEME ROW ── */
-.theme-row {
-  margin: 12px 16px 0;
-  background: var(--card); border-radius: var(--r);
-  padding: 14px 16px;
-  display: flex; align-items: center; gap: 14px;
-  box-shadow: 0 1px 3px rgba(0,0,0,.06);
+/* ── THEME CARD ── */
+.theme-card{
+  margin:12px 16px 0;background:var(--card);border-radius:var(--r);
+  padding:14px 16px;display:flex;align-items:center;gap:14px;
+  box-shadow:0 1px 4px rgba(0,0,0,.07);
 }
-.theme-emoji { font-size: 28px; flex-shrink: 0; }
-.theme-body {}
-.theme-label { font-size: 11px; font-weight: 600; color: var(--accent); letter-spacing: .5px; text-transform: uppercase; margin-bottom: 3px; }
-.theme-text { font-size: 15px; font-weight: 600; color: var(--text); }
+.theme-em{font-size:30px;flex-shrink:0}
+.theme-lbl{font-size:10px;font-weight:700;color:var(--accent);letter-spacing:.6px;text-transform:uppercase;margin-bottom:3px}
+.theme-txt{font-size:15px;font-weight:600;color:var(--text)}
 
-/* ── SECTION ── */
-.page-body { padding: 8px 16px 0; }
-.section-label {
-  font-size: 12px; font-weight: 600; color: var(--sub);
-  letter-spacing: .4px; text-transform: uppercase;
-  padding: 16px 4px 6px;
-}
-.card { background: var(--card); border-radius: var(--r); overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,.06); }
+/* ── SECTION LABEL ── */
+.page-body{padding:4px 16px 0}
+.sec-lbl{font-size:11px;font-weight:600;color:var(--sub);letter-spacing:.4px;text-transform:uppercase;padding:16px 4px 6px;display:flex;align-items:center;gap:8px}
+.sec-count{background:var(--accent);color:#fff;border-radius:10px;padding:1px 7px;font-size:10px;font-weight:700;letter-spacing:0;text-transform:none}
 
-/* ── ROWS ── */
-.row {
-  display: flex; align-items: center; gap: 12px;
-  padding: 13px 16px; border-bottom: 1px solid var(--sep);
-  transition: opacity .18s;
+/* ── UNIFIED SCHEDULE CARD ── */
+.sched-card{background:var(--card);border-radius:var(--r);overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.07)}
+.srow{
+  display:flex;align-items:center;gap:10px;padding:12px 16px;
+  border-bottom:.5px solid var(--sep);transition:opacity .2s;
+  position:relative;
 }
-.row:last-child { border-bottom: none; }
-.row.done { opacity: var(--done-op); }
+.srow:last-child{border-bottom:none}
+.srow.done{opacity:var(--done-op)}
+/* fixed = light gray tint */
+.srow.fx{background:var(--card-fx)}
+/* free = white */
+.srow.fr{background:var(--card)}
+.srow-type{
+  position:absolute;left:0;top:0;bottom:0;width:3px;border-radius:0;
+}
+.srow.fr .srow-type{background:var(--accent)}
+.srow.fx .srow-type{background:transparent}
 
-/* check circle */
-.chk {
-  width: 24px; height: 24px; border-radius: 50%;
-  border: 2px solid var(--sep2); flex-shrink: 0; cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  transition: all .18s; background: var(--fill);
+/* check */
+.chk{
+  width:24px;height:24px;border-radius:50%;
+  border:2px solid var(--sub2);flex-shrink:0;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .18s;background:var(--bg);
 }
-.chk.on { background: var(--accent); border-color: var(--accent); }
-.chk.on::after { content: ''; display: block; width: 6px; height: 10px; border: 2.5px solid #fff; border-top: none; border-left: none; transform: rotate(45deg) translate(-1px,-1px); }
-
-/* check square */
-.chk-sq {
-  width: 24px; height: 24px; border-radius: 6px;
-  border: 2px solid var(--sep2); flex-shrink: 0; cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  transition: all .18s; background: var(--fill);
+.chk.on{background:var(--accent);border-color:var(--accent)}
+.chk.on::after{content:'';display:block;width:6px;height:10px;border:2.5px solid #fff;border-top:none;border-left:none;transform:rotate(45deg) translate(-1px,-1px)}
+.chk-sq{
+  width:24px;height:24px;border-radius:7px;
+  border:2px solid var(--sub2);flex-shrink:0;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .18s;background:var(--bg);
 }
-.chk-sq.on { background: var(--accent); border-color: var(--accent); }
-.chk-sq.on::after { content: ''; display: block; width: 6px; height: 10px; border: 2.5px solid #fff; border-top: none; border-left: none; transform: rotate(45deg) translate(-1px,-1px); }
+.chk-sq.on{background:var(--accent);border-color:var(--accent)}
+.chk-sq.on::after{content:'';display:block;width:6px;height:10px;border:2.5px solid #fff;border-top:none;border-left:none;transform:rotate(45deg) translate(-1px,-1px)}
 
 /* time input */
-.t-input {
-  background: var(--fill); border: none; border-radius: var(--r-sm);
-  padding: 6px 10px; font-size: 13px; font-weight: 500; color: var(--sub);
-  cursor: pointer; outline: none; font-family: inherit; text-align: center;
-  -webkit-appearance: none; min-width: 68px;
+.ti{
+  background:rgba(118,118,128,.08);border:none;border-radius:var(--r-sm);
+  padding:5px 8px;font-size:12px;font-weight:600;color:var(--sub);
+  cursor:pointer;outline:none;font-family:inherit;text-align:center;
+  -webkit-appearance:none;min-width:54px;flex-shrink:0;
 }
-.t-input::-webkit-calendar-picker-indicator { opacity: 0; position: absolute; width: 100%; height: 100%; }
-.t-input:focus, .t-input:active { background: var(--sep); color: var(--text); }
-.t-sep { font-size: 12px; color: var(--sub2); flex-shrink: 0; }
-
-.row-label { flex: 1; font-size: 15px; color: var(--text); line-height: 1.3; }
-.row.done .row-label { text-decoration: line-through; color: var(--sub); }
-
-.free-label-inp {
-  flex: 1; border: none; background: transparent; font-size: 15px; color: var(--text);
-  outline: none; font-family: inherit; min-width: 0;
+.ti:focus,.ti:active{background:rgba(255,59,48,.1);color:var(--accent)}
+.t-sep{font-size:11px;color:var(--sub2);flex-shrink:0}
+.row-lbl{flex:1;font-size:15px;color:var(--text);line-height:1.3;min-width:0}
+.srow.done .row-lbl{text-decoration:line-through;color:var(--sub)}
+.fr-lbl-inp{
+  flex:1;border:none;background:transparent;font-size:15px;
+  color:var(--text);outline:none;font-family:inherit;min-width:0;
 }
-.free-label-inp::placeholder { color: var(--sub2); }
-
-.del-btn {
-  background: none; border: none; color: var(--sub2);
-  font-size: 18px; cursor: pointer; padding: 4px; flex-shrink: 0;
-  display: flex; align-items: center; justify-content: center;
-  width: 28px; height: 28px; border-radius: 50%;
+.fr-lbl-inp::placeholder{color:var(--sub2)}
+.del-btn{
+  background:none;border:none;cursor:pointer;padding:2px;
+  flex-shrink:0;display:flex;align-items:center;justify-content:center;
+  width:26px;height:26px;border-radius:50%;
 }
-.del-btn:active { background: var(--fill); color: var(--accent); }
+.del-btn:active{background:rgba(0,0,0,.05)}
+.fx-badge{font-size:10px;font-weight:600;color:var(--sub2);background:rgba(118,118,128,.1);border-radius:5px;padding:2px 6px;flex-shrink:0}
 
 /* add button */
-.add-row {
-  display: flex; align-items: center; justify-content: center;
-  padding: 13px 16px; gap: 6px; cursor: pointer;
-  background: none; border: none; width: 100%;
-  font-size: 15px; font-weight: 500; color: var(--accent); font-family: inherit;
+.add-row{
+  display:flex;align-items:center;justify-content:center;gap:6px;
+  padding:13px 16px;cursor:pointer;background:none;border:none;
+  width:100%;font-size:14px;font-weight:500;color:var(--accent);font-family:inherit;
 }
 
-/* progress pill */
-.prog-pill {
-  background: var(--fill); border-radius: 20px; padding: 3px 10px;
-  font-size: 12px; font-weight: 600; color: var(--sub);
+/* ── TODO ── */
+.todo-row{
+  display:flex;align-items:center;gap:12px;padding:12px 16px;
+  border-bottom:.5px solid var(--sep);
 }
-.prog-pill.complete { background: rgba(255,59,48,.1); color: var(--accent); }
-.card-header {
-  display: flex; align-items: center; gap: 10px;
-  padding: 12px 16px; border-bottom: 1px solid var(--sep);
+.todo-row:last-of-type{border-bottom:none}
+.todo-row.done{opacity:var(--done-op)}
+.todo-inp{
+  flex:1;border:none;background:transparent;font-size:15px;
+  color:var(--text);outline:none;font-family:inherit;min-width:0;
 }
-.card-header-icon { font-size: 16px; }
-.card-header-title { font-size: 14px; font-weight: 600; color: var(--text); flex: 1; }
-
-/* todo add */
-.todo-add-wrap { display: flex; gap: 10px; padding: 12px 16px; border-top: 1px solid var(--sep); }
-.todo-new-inp {
-  flex: 1; background: var(--fill); border: none; border-radius: var(--r-sm);
-  padding: 10px 14px; font-size: 15px; outline: none; font-family: inherit; color: var(--text);
+.todo-inp.done{text-decoration:line-through;color:var(--sub)}
+.todo-add-wrap{display:flex;gap:10px;padding:12px 16px;border-top:.5px solid var(--sep)}
+.todo-new{
+  flex:1;background:rgba(118,118,128,.08);border:none;border-radius:var(--r-sm);
+  padding:10px 14px;font-size:15px;outline:none;font-family:inherit;color:var(--text);
 }
-.todo-new-inp:focus { background: var(--sep); }
-.todo-new-inp::placeholder { color: var(--sub2); }
-.todo-add-btn {
-  background: var(--accent); border: none; border-radius: var(--r-sm);
-  padding: 10px 18px; color: #fff; font-size: 15px; font-weight: 600;
-  cursor: pointer; flex-shrink: 0; font-family: inherit;
+.todo-new:focus{background:rgba(118,118,128,.12)}
+.todo-new::placeholder{color:var(--sub2)}
+.todo-add-btn{
+  background:var(--accent);border:none;border-radius:var(--r-sm);
+  padding:10px 18px;color:#fff;font-size:15px;font-weight:600;
+  cursor:pointer;flex-shrink:0;font-family:inherit;
 }
-.todo-inp {
-  flex: 1; border: none; background: transparent; font-size: 15px;
-  color: var(--text); outline: none; font-family: inherit; min-width: 0;
-}
-.todo-inp.done { text-decoration: line-through; color: var(--sub); }
 
 /* ── STREAK ── */
-.streak-wrap { padding: 12px 16px 16px; }
-.streak-dots { display: flex; gap: 6px; }
-.s-dot {
-  flex: 1; aspect-ratio: 1; border-radius: 50%;
-  background: var(--fill); border: 1.5px solid var(--sep);
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  font-size: 9px; font-weight: 700; color: var(--sub2); transition: all .2s;
+.streak-wrap{padding:16px}
+.streak-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.streak-title{font-size:13px;font-weight:600;color:var(--sub)}
+.streak-stat{font-size:13px;font-weight:600;color:var(--accent)}
+.streak-dots{display:flex;gap:5px;justify-content:center}
+.sdot{
+  flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;
+  padding:10px 4px;border-radius:12px;background:rgba(118,118,128,.06);
+  border:1.5px solid transparent;transition:all .22s;
 }
-.s-dot.today { border-color: var(--accent); color: var(--accent); background: rgba(255,59,48,.06); }
-.s-dot.done { background: var(--accent); border-color: var(--accent); color: #fff; box-shadow: 0 2px 8px rgba(255,59,48,.25); }
-.s-dot .dn { font-size: 8px; }
-.s-dot .de { font-size: 11px; }
-.streak-stat { text-align: center; font-size: 13px; color: var(--sub); margin-top: 10px; }
-.streak-stat b { color: var(--accent); font-weight: 700; }
+.sdot.today{border-color:var(--accent);background:rgba(255,59,48,.05)}
+.sdot.done{background:var(--accent);box-shadow:0 3px 10px rgba(255,59,48,.28)}
+.sdot-day{font-size:9px;font-weight:700;color:var(--sub2);letter-spacing:.3px}
+.sdot.today .sdot-day{color:var(--accent)}
+.sdot.done .sdot-day{color:rgba(255,255,255,.8)}
+.sdot-icon{font-size:16px;line-height:1}
+.sdot.done .sdot-icon{filter:none}
+.sdot-bar-wrap{height:4px;background:rgba(118,118,128,.12);border-radius:2px;margin:2px 0;width:100%}
+.sdot-bar{height:100%;background:var(--accent);border-radius:2px;transition:width .3s}
+.streak-msg{text-align:center;font-size:12px;color:var(--sub);margin-top:10px}
+.streak-msg b{color:var(--accent)}
 
 /* ── BOTTOM NAV ── */
-.bottom-nav {
-  position: fixed; bottom: 0; left: 0; right: 0;
-  background: rgba(255,255,255,.92);
-  -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px);
-  border-top: .5px solid var(--sep);
-  display: flex;
-  height: calc(var(--tab-h) + var(--safe-b));
-  padding-bottom: var(--safe-b);
-  z-index: 100;
+.bottom-nav{
+  position:fixed;bottom:0;left:0;right:0;
+  background:rgba(249,249,249,.82);
+  -webkit-backdrop-filter:saturate(180%) blur(20px);
+  backdrop-filter:saturate(180%) blur(20px);
+  border-top:.5px solid rgba(0,0,0,.12);
+  display:flex;
+  height:calc(56px + var(--safe-b));
+  padding-bottom:var(--safe-b);
+  z-index:100;
 }
-.nav-btn {
-  flex: 1; display: flex; flex-direction: column; align-items: center;
-  justify-content: center; gap: 3px; border: none; background: none;
-  cursor: pointer; color: var(--sub2); font-size: 10px; font-weight: 500;
-  letter-spacing: .1px; padding: 6px 0 0;
+.nav-btn{
+  flex:1;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:2px;border:none;background:none;
+  cursor:pointer;color:var(--sub2);font-size:10px;font-weight:500;padding:6px 0 0;
 }
-.nav-btn .ni { font-size: 22px; line-height: 1; }
-.nav-btn.active { color: var(--accent); }
+.nav-btn .ni{font-size:22px;line-height:1}
+.nav-btn.active{color:var(--accent)}
 
-/* ── REFLECTION SCREEN ── */
-.screen-header {
-  background: var(--card);
-  padding: 16px 20px 18px;
-  padding-top: calc(16px + var(--safe-t));
-  border-bottom: 1px solid var(--sep);
+/* ── SCREEN HEADER ── */
+.scr-hdr{
+  background:var(--card);padding:16px 20px 16px;
+  padding-top:calc(14px + var(--safe-t));
+  border-bottom:.5px solid var(--sep);
 }
-.screen-title { font-size: 20px; font-weight: 700; color: var(--text); letter-spacing: -.3px; }
-.screen-sub { font-size: 13px; color: var(--sub); margin-top: 3px; }
+.scr-title{font-size:20px;font-weight:700;color:var(--text);letter-spacing:-.3px}
+.scr-sub{font-size:13px;color:var(--sub);margin-top:3px}
 
-.refl-group-lbl {
-  font-size: 11px; font-weight: 600; color: var(--sub);
-  letter-spacing: .5px; text-transform: uppercase;
-  padding: 16px 4px 6px; display: flex; align-items: center; gap: 6px;
+/* ── REFLECTION ── */
+.refl-grp-lbl{
+  font-size:11px;font-weight:600;color:var(--sub);letter-spacing:.5px;
+  text-transform:uppercase;padding:16px 4px 6px;
+  display:flex;align-items:center;gap:7px;
 }
-.lbl-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
-.lbl-dot.g { background: #34C759; }
-.lbl-dot.b { background: #007AFF; }
-.lbl-dot.o { background: #FF9500; }
-
-.refl-item {
-  display: flex; align-items: flex-start;
-  padding: 14px 16px; gap: 12px; border-bottom: 1px solid var(--sep);
+.ld{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.refl-item{
+  display:flex;align-items:flex-start;padding:14px 16px;gap:12px;
+  border-bottom:.5px solid var(--sep);
 }
-.refl-item:last-child { border-bottom: none; }
-.refl-num { font-size: 13px; font-weight: 600; color: var(--sub); min-width: 14px; padding-top: 2px; }
-.refl-ta {
-  flex: 1; border: none; background: transparent; font-size: 15px;
-  color: var(--text); resize: none; outline: none; font-family: inherit;
-  line-height: 1.5; min-height: 22px; overflow: hidden;
+.refl-item:last-child{border-bottom:none}
+.refl-num{font-size:13px;font-weight:600;color:var(--sub);min-width:14px;padding-top:2px}
+.refl-ta{
+  flex:1;border:none;background:transparent;font-size:15px;
+  color:var(--text);resize:none;outline:none;font-family:inherit;
+  line-height:1.5;min-height:22px;overflow:hidden;
 }
-.refl-ta::placeholder { color: var(--sub2); }
-.refl-ta[readonly] { color: var(--sub); }
-
-.refl-save-btn {
-  width: 100%; padding: 15px; border-radius: var(--r);
-  background: var(--accent); border: none; color: #fff;
-  font-size: 16px; font-weight: 600; cursor: pointer; font-family: inherit;
-  margin-top: 8px;
+.refl-ta::placeholder{color:var(--sub2)}
+.refl-ta[readonly]{color:var(--sub)}
+.refl-save-btn{
+  width:100%;padding:15px;border-radius:var(--r);background:var(--accent);
+  border:none;color:#fff;font-size:16px;font-weight:600;cursor:pointer;
+  font-family:inherit;margin-top:8px;
 }
-.refl-saved-card {
-  background: var(--card); border-radius: var(--r);
-  padding: 16px; text-align: center;
-  box-shadow: 0 1px 3px rgba(0,0,0,.06); margin-top: 8px;
+.refl-saved-card{
+  background:var(--card);border-radius:var(--r);padding:18px 16px;
+  text-align:center;box-shadow:0 1px 4px rgba(0,0,0,.07);margin-top:8px;
 }
-.refl-saved-text { font-size: 15px; font-weight: 600; color: #34C759; }
-.refl-saved-sub { font-size: 13px; color: var(--sub); margin-top: 4px; }
-.refl-edit-btn {
-  background: none; border: none; color: var(--sub); font-size: 13px;
-  cursor: pointer; text-decoration: underline; margin-top: 8px; font-family: inherit;
+.refl-saved-txt{font-size:15px;font-weight:600;color:var(--green)}
+.refl-saved-sub{font-size:13px;color:var(--sub);margin-top:4px}
+.refl-edit-btn{
+  background:none;border:none;color:var(--sub);font-size:13px;
+  cursor:pointer;text-decoration:underline;margin-top:10px;font-family:inherit;
 }
 
 /* ── SETTINGS ── */
-.settings-body { padding: 8px 16px 0; }
+.settings-body{padding:8px 16px 0}
 
-/* ── UTIL ── */
-.hidden { display: none !important; }
+/* ── CARD wrapper ── */
+.card{background:var(--card);border-radius:var(--r);overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.07)}
 </style>
 </head>
 <body>
 
 <!-- Setup -->
 <div id="setup-screen">
-  <div class="setup-icon">⏱</div>
-  <div class="setup-h">試合まで8日間</div>
-  <div class="setup-p">試合日を設定してスタートしよう</div>
-  <div class="setup-form">
-    <label class="setup-label">試合日</label>
-    <input type="date" class="setup-date-input" id="setup-date">
-    <button class="setup-btn" id="setup-btn">はじめる</button>
+  <img class="su-icon" src="/icon-192.png" alt="icon">
+  <div class="su-h">試合まで8日間</div>
+  <div class="su-p">試合日を設定してスタートしよう</div>
+  <div class="su-form">
+    <label class="su-lbl">試合日</label>
+    <input type="date" class="su-input" id="setup-date">
+    <button class="su-btn" id="setup-btn">はじめる</button>
   </div>
 </div>
 
 <!-- App -->
 <div id="app-screen">
-
   <!-- HOME -->
   <div class="screen active" id="screen-home">
-    <div class="home-header" id="home-header"></div>
-    <div class="theme-row" id="theme-row"></div>
+    <div class="home-hdr" id="home-hdr"></div>
+    <div class="theme-card" id="theme-card"></div>
     <div class="page-body" id="home-body"></div>
   </div>
 
   <!-- REFLECTION -->
   <div class="screen" id="screen-refl">
-    <div class="screen-header" id="refl-header"></div>
+    <div class="scr-hdr" id="refl-hdr"></div>
     <div class="page-body" id="refl-body"></div>
   </div>
 
   <!-- SETTINGS -->
   <div class="screen" id="screen-settings">
-    <div class="screen-header">
-      <div class="screen-title">設定</div>
-    </div>
+    <div class="scr-hdr"><div class="scr-title">設定</div></div>
     <div class="settings-body">
-      <div class="section-label">試合日</div>
+      <div class="sec-lbl">試合日</div>
       <div class="card" style="padding:16px">
-        <input type="date" class="setup-date-input" id="settings-date" style="margin-bottom:12px">
-        <button class="setup-btn" id="settings-save">保存する</button>
+        <input type="date" class="su-input" id="settings-date" style="margin-bottom:12px">
+        <button class="su-btn" id="settings-save">保存する</button>
       </div>
-      <div class="section-label">データ</div>
+      <div class="sec-lbl">データ管理</div>
       <div class="card">
-        <button class="row" style="border:none;background:none;width:100%;cursor:pointer;color:#FF3B30;font-size:15px;font-family:inherit;justify-content:center" id="reset-btn">
+        <button style="width:100%;padding:14px 16px;border:none;background:none;font-size:15px;color:var(--accent);font-family:inherit;cursor:pointer" id="reset-btn">
           すべてのデータをリセット
         </button>
       </div>
@@ -364,265 +338,241 @@ body {
 </div>
 
 <script>
-// ── constants ──
-const LS = 'match8day_v3';
-const THEMES = [
+const LS='match8day_v4';
+const THEMES=[
   ['🏃','基礎を固める日'],['💪','体を動かす日'],['🧠','イメトレをする日'],
   ['⚡','弱点を克服する日'],['🤝','チームと連携する日'],['🧘','メンタルを整える日'],
   ['🔥','コンディションを上げる日'],['🏆','本番のつもりで臨む日'],
 ];
-const FX = [
-  {id:'wake',  label:'起床',               def:'08:00'},
-  {id:'jog',   label:'ジョギング',          def:'08:30'},
-  {id:'clean', label:'片付け',              def:'09:00'},
-  {id:'plan',  label:'やることリスト作成',   def:'10:00'},
+const FX_DEF=[
+  {id:'wake',  label:'起床',                def:'08:00'},
+  {id:'jog',   label:'ジョギング',           def:'08:30'},
+  {id:'clean', label:'片付け',               def:'09:00'},
+  {id:'plan',  label:'やることリスト作成',    def:'10:00'},
   {id:'night', label:'シャワー・夜ご飯・洗濯',def:'21:00'},
-  {id:'sleep', label:'就寝',               def:'23:00'},
+  {id:'sleep', label:'就寝',                def:'23:00'},
 ];
+const STREAK_MSG=['まずは1日目！','2日連続！','3日継続中！','折り返し！','5日突破！','残り3日！','あと1日！','全8日達成！🏆'];
 
-// ── state ──
-let S = {}, tab = 'home', reflEdit = false;
+let S={},tab='home',reflEdit=false;
+function load(){try{S=JSON.parse(localStorage.getItem(LS))||{};}catch{S={};}}
+function save(){localStorage.setItem(LS,JSON.stringify(S));}
 
-function load(){ try{ S = JSON.parse(localStorage.getItem(LS))||{}; }catch{ S={}; } }
-function save(){ localStorage.setItem(LS, JSON.stringify(S)); }
-
-// ── date helpers ──
-function todayStr(){
-  const d = new Date();
-  return `${d.getFullYear()}-${p2(d.getMonth()+1)}-${p2(d.getDate())}`;
-}
-function p2(n){ return String(n).padStart(2,'0'); }
-function parseL(s){ const [y,m,d]=s.split('-').map(Number); return new Date(y,m-1,d); }
-function dStr(d){ return `${d.getFullYear()}-${p2(d.getMonth()+1)}-${p2(d.getDate())}`; }
-function jaDate(s){
-  const d=parseL(s), w=['日','月','火','水','木','金','土'][d.getDay()];
-  return `${d.getMonth()+1}月${d.getDate()}日（${w}）`;
-}
-function daysLeft(){ return Math.ceil((parseL(S.matchDate)-parseL(todayStr()))/86400000); }
-function dayIdx(){
-  if(!S.startDate) return 1;
-  const diff=Math.ceil((parseL(todayStr())-parseL(S.startDate))/86400000);
-  return Math.max(1,Math.min(8,diff+1));
-}
-function startFrom(ms){
-  const d=parseL(ms); d.setDate(d.getDate()-7); return dStr(d);
-}
-function get8(){
-  if(!S.startDate) return [];
-  const s=parseL(S.startDate);
-  return Array.from({length:8},(_,i)=>{ const d=new Date(s); d.setDate(d.getDate()+i); return dStr(d); });
-}
+function todayStr(){const d=new Date();return`${d.getFullYear()}-${p2(d.getMonth()+1)}-${p2(d.getDate())}`;}
+function p2(n){return String(n).padStart(2,'0');}
+function parseL(s){const[y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d);}
+function dStr(d){return`${d.getFullYear()}-${p2(d.getMonth()+1)}-${p2(d.getDate())}`;}
+function jaDate(s){const d=parseL(s),w=['日','月','火','水','木','金','土'][d.getDay()];return`${d.getMonth()+1}月${d.getDate()}日（${w}）`;}
+function daysLeft(){return Math.ceil((parseL(S.matchDate)-parseL(todayStr()))/86400000);}
+function dayIdx(){if(!S.startDate)return 1;const diff=Math.ceil((parseL(todayStr())-parseL(S.startDate))/86400000);return Math.max(1,Math.min(8,diff+1));}
+function startFrom(ms){const d=parseL(ms);d.setDate(d.getDate()-7);return dStr(d);}
+function get8(){if(!S.startDate)return[];const s=parseL(S.startDate);return Array.from({length:8},(_,i)=>{const d=new Date(s);d.setDate(d.getDate()+i);return dStr(d);});}
 function ds(date){
-  if(!S.days) S.days={};
-  if(!S.days[date]) S.days[date]={};
+  if(!S.days)S.days={};
+  if(!S.days[date])S.days[date]={};
   const d=S.days[date];
-  if(!d.ft) d.ft={};
-  if(!d.fd) d.fd={};
-  if(!d.fb) d.fb=[];
-  if(!d.todos) d.todos=[];
-  if(!d.refl) d.refl={d1:'',d2:'',d3:'',ax:'',tm:''};
-  if(d.rs===undefined) d.rs=false;
+  if(!d.ft)d.ft={};if(!d.fd)d.fd={};
+  if(!d.fb)d.fb=[];if(!d.todos)d.todos=[];
+  if(!d.refl)d.refl={d1:'',d2:'',d3:'',ax:'',tm:''};
+  if(d.rs===undefined)d.rs=false;
   return d;
 }
-
-function e(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function e(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function timeVal(s){if(!s)return 9999;const[h,m]=s.split(':').map(Number);return h*60+(m||0);}
 
 // ── RENDER HOME ──
 function renderHome(){
-  const today=todayStr(), d=ds(today);
-  const left=Math.max(0,daysLeft()), n=dayIdx();
-  const [ti,tt]=THEMES[Math.min(n-1,7)];
+  const today=todayStr(),d=ds(today);
+  const left=Math.max(0,daysLeft()),n=dayIdx();
+  const[ti,tt]=THEMES[Math.min(n-1,7)];
 
-  document.getElementById('home-header').innerHTML=`
-    <div class="hdr-row1">
-      <div>
-        <div class="hdr-date-label">TODAY</div>
-        <div class="hdr-date">${jaDate(today)}</div>
-      </div>
+  // header
+  document.getElementById('home-hdr').innerHTML=`
+    <div class="hdr-top">
+      <div><div class="hdr-date-lbl">TODAY</div><div class="hdr-date">${jaDate(today)}</div></div>
       <div class="day-pill">DAY ${n} / 8</div>
     </div>
-    <div class="countdown-block">
-      <span class="count-num">${left}</span>
-      <span class="count-unit"> 日後</span>
-    </div>
-    <div class="count-sub">試合: ${jaDate(S.matchDate)}</div>`;
+    <div class="cnt-row"><span class="cnt-n">${left}</span><span class="cnt-u"> 日後</span></div>
+    <div class="cnt-s">試合: ${jaDate(S.matchDate)}</div>`;
 
-  document.getElementById('theme-row').innerHTML=`
-    <div class="theme-emoji">${ti}</div>
-    <div class="theme-body">
-      <div class="theme-label">TODAY'S THEME</div>
-      <div class="theme-text">${tt}</div>
-    </div>`;
+  // theme
+  document.getElementById('theme-card').innerHTML=`
+    <div class="theme-em">${ti}</div>
+    <div><div class="theme-lbl">TODAY'S THEME</div><div class="theme-txt">${tt}</div></div>`;
 
-  let html='';
-
-  // fixed schedule
-  const fxDone=FX.filter(f=>d.fd[f.id]).length;
-  const fxAll=FX.length;
-  html+=`<div class="section-label">固定スケジュール</div>
-  <div class="card">`;
-  FX.forEach(f=>{
-    const done=!!d.fd[f.id], time=d.ft[f.id]||f.def;
-    html+=`<div class="row${done?' done':''}">
-      <div class="chk${done?' on':''}" data-a="fx" data-id="${f.id}"></div>
-      <div style="position:relative;flex-shrink:0">
-        <input class="t-input" type="time" value="${time}" data-a="fxt" data-id="${f.id}">
-      </div>
-      <div class="row-label">${f.label}</div>
-    </div>`;
+  // ── unified schedule (fixed + free merged by time) ──
+  // build items array
+  const items=[];
+  FX_DEF.forEach(f=>{
+    items.push({type:'fx',id:f.id,label:f.label,time:d.ft[f.id]||f.def,done:!!d.fd[f.id]});
   });
-  html+=`</div>`;
-
-  // free
-  html+=`<div class="section-label">自由スケジュール <span style="font-size:11px;font-weight:400;letter-spacing:0;text-transform:none">9:00〜21:00</span></div>
-  <div class="card">`;
   d.fb.forEach((b,i)=>{
-    const done=!!b.done;
-    html+=`<div class="row${done?' done':''}">
-      <div class="chk${done?' on':''}" data-a="fr" data-i="${i}"></div>
-      <input class="t-input" type="time" value="${b.s||''}" data-a="frs" data-i="${i}" placeholder="開始">
-      <span class="t-sep">–</span>
-      <input class="t-input" type="time" value="${b.e||''}" data-a="fre" data-i="${i}" placeholder="終了">
-      <input class="free-label-inp" type="text" value="${e(b.l||'')}" placeholder="やること" data-a="frl" data-i="${i}">
-      <button class="del-btn" data-a="frd" data-i="${i}">
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" fill="#C7C7CC"/><path d="M5 5l6 6M11 5l-6 6" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/></svg>
-      </button>
-    </div>`;
+    items.push({type:'fr',i,start:b.s||'',end:b.e||'',label:b.l||'',done:!!b.done});
   });
+  // sort by time
+  items.sort((a,b)=>{
+    const at=a.type==='fx'?timeVal(a.time):timeVal(a.start);
+    const bt=b.type==='fx'?timeVal(b.time):timeVal(b.start);
+    return at-bt;
+  });
+
+  const fxDone=FX_DEF.filter(f=>d.fd[f.id]).length;
+  let html=`<div class="sec-lbl">スケジュール<span class="sec-count">${fxDone}/${FX_DEF.length}</span></div>
+  <div class="sched-card">`;
+
+  items.forEach(item=>{
+    if(item.type==='fx'){
+      html+=`<div class="srow fx${item.done?' done':''}">
+        <div class="srow-type"></div>
+        <div class="chk${item.done?' on':''}" data-a="fx" data-id="${item.id}"></div>
+        <input class="ti" type="time" value="${item.time}" data-a="fxt" data-id="${item.id}">
+        <div class="row-lbl">${item.label}</div>
+        <span class="fx-badge">固定</span>
+      </div>`;
+    } else {
+      const trange=item.start&&item.end?`${item.start.slice(0,5)}–${item.end.slice(0,5)}`:item.start?item.start.slice(0,5):'';
+      html+=`<div class="srow fr${item.done?' done':''}">
+        <div class="srow-type"></div>
+        <div class="chk${item.done?' on':''}" data-a="fr" data-i="${item.i}"></div>
+        <input class="ti" type="time" value="${item.start}" data-a="frs" data-i="${item.i}">
+        <span class="t-sep">–</span>
+        <input class="ti" type="time" value="${item.end}" data-a="fre" data-i="${item.i}">
+        <input class="fr-lbl-inp" type="text" value="${e(item.label)}" placeholder="やること" data-a="frl" data-i="${item.i}">
+        <button class="del-btn" data-a="frd" data-i="${item.i}">
+          <svg width="18" height="18" viewBox="0 0 18 18"><circle cx="9" cy="9" r="9" fill="#C7C7CC"/><path d="M6 6l6 6M12 6l-6 6" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </button>
+      </div>`;
+    }
+  });
+
   html+=`<button class="add-row" data-a="fra">
-    <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="8.5" stroke="#FF3B30" stroke-width="1"/><path d="M9 5.5v7M5.5 9h7" stroke="#FF3B30" stroke-width="1.5" stroke-linecap="round"/></svg>
-    <span>ブロックを追加</span>
+    <svg width="16" height="16" viewBox="0 0 16 16"><circle cx="8" cy="8" r="7.5" stroke="var(--accent)" fill="none" stroke-width="1.2"/><path d="M8 4.5v7M4.5 8h7" stroke="var(--accent)" stroke-width="1.5" stroke-linecap="round"/></svg>
+    予定を追加
   </button></div>`;
 
-  // todo
+  // todos
   const tdDone=d.todos.filter(t=>t.done).length;
-  html+=`<div class="section-label">やることリスト</div>
+  html+=`<div class="sec-lbl">やることリスト<span class="sec-count">${tdDone}/${d.todos.length}</span></div>
   <div class="card">`;
   d.todos.forEach((t,i)=>{
     const done=!!t.done;
-    html+=`<div class="row${done?' done':''}">
+    html+=`<div class="todo-row${done?' done':''}">
       <div class="chk-sq${done?' on':''}" data-a="td" data-i="${i}"></div>
       <input class="todo-inp${done?' done':''}" type="text" value="${e(t.text||'')}" data-a="tdt" data-i="${i}">
       <button class="del-btn" data-a="tdd" data-i="${i}">
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" fill="#C7C7CC"/><path d="M5 5l6 6M11 5l-6 6" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/></svg>
+        <svg width="18" height="18" viewBox="0 0 18 18"><circle cx="9" cy="9" r="9" fill="#C7C7CC"/><path d="M6 6l6 6M12 6l-6 6" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/></svg>
       </button>
     </div>`;
   });
   html+=`<div class="todo-add-wrap">
-    <input class="todo-new-inp" id="todo-inp" type="text" placeholder="タスクを追加...">
+    <input class="todo-new" id="todo-inp" type="text" placeholder="タスクを追加...">
     <button class="todo-add-btn" data-a="tda">追加</button>
   </div></div>`;
 
   // streak
   const days8=get8();
-  const filled=days8.filter(ds2=>S.days?.[ds2]?.rs).length;
-  html+=`<div class="section-label">継続ゲージ</div>
-  <div class="card">
-    <div class="streak-wrap">
-      <div class="streak-dots">`;
+  const filled=days8.filter(x=>S.days?.[x]?.rs).length;
+  const pct=Math.round(filled/8*100);
+  html+=`<div class="sec-lbl">継続ゲージ</div>
+  <div class="card"><div class="streak-wrap">
+    <div class="streak-top">
+      <div class="streak-title">8日間チャレンジ</div>
+      <div class="streak-stat">${filled} / 8日</div>
+    </div>
+    <div class="streak-dots">`;
   days8.forEach((ds2,i)=>{
-    const f=!!S.days?.[ds2]?.rs, isT=ds2===today;
-    html+=`<div class="s-dot${f?' done':''}${isT&&!f?' today':''}">
-      <span class="dn">${i+1}</span>
-      <span class="de">${f?'✓':'·'}</span>
+    const f=!!S.days?.[ds2]?.rs,isT=ds2===todayStr();
+    html+=`<div class="sdot${f?' done':''}${isT&&!f?' today':''}">
+      <span class="sdot-day">D${i+1}</span>
+      <span class="sdot-icon">${f?'🔥':'·'}</span>
     </div>`;
   });
-  html+=`</div><div class="streak-stat"><b>${filled}</b> / 8日 振り返り完了</div>
-    </div>
-  </div>`;
+  html+=`</div>
+    <div class="streak-msg">${filled>0?`<b>${filled}日連続継続中！</b> このまま続けよう`:'振り返りを記録して継続ゲージを点灯させよう'}</div>
+  </div></div>`;
 
   document.getElementById('home-body').innerHTML=html;
 }
 
 // ── RENDER REFLECTION ──
 function renderRefl(){
-  const today=todayStr(), d=ds(today);
-  const r=d.refl, saved=d.rs, ro=saved&&!reflEdit;
+  const today=todayStr(),d=ds(today),r=d.refl;
+  const saved=d.rs,ro=saved&&!reflEdit;
 
-  document.getElementById('refl-header').innerHTML=`
-    <div class="screen-title">夜の振り返り</div>
-    <div class="screen-sub">${jaDate(today)}</div>`;
+  document.getElementById('refl-hdr').innerHTML=`
+    <div class="scr-title">夜の振り返り</div>
+    <div class="scr-sub">${jaDate(today)}</div>`;
 
-  const ta=(k,ph,num='')=>{
-    const v=e(r[k]||'');
-    return `<div class="refl-item">
-      ${num?`<span class="refl-num">${num}</span>`:''}
-      <textarea class="refl-ta" data-k="${k}" placeholder="${ph}" rows="1"${ro?' readonly':''}>${v}</textarea>
-    </div>`;
-  };
+  const ta=(k,ph,num='')=>`<div class="refl-item">
+    ${num?`<span class="refl-num">${num}</span>`:''}
+    <textarea class="refl-ta" data-k="${k}" placeholder="${ph}" rows="1"${ro?' readonly':''}>${e(r[k]||'')}</textarea>
+  </div>`;
 
   let html=`
-  <div class="section-label"><span class="lbl-dot g" style="width:6px;height:6px;border-radius:50%;background:#34C759;display:inline-block"></span> できたこと</div>
-  <div class="card">
-    ${ta('d1','できたこと①...','1')}
-    ${ta('d2','できたこと②...','2')}
-    ${ta('d3','できたこと③...','3')}
-  </div>
-  <div class="section-label"><span style="width:6px;height:6px;border-radius:50%;background:#007AFF;display:inline-block"></span> 不安だったこと</div>
+  <div class="refl-grp-lbl"><span class="ld" style="background:var(--green)"></span>今日できたこと</div>
+  <div class="card">${ta('d1','できたこと①','1')}${ta('d2','できたこと②','2')}${ta('d3','できたこと③','3')}</div>
+  <div class="refl-grp-lbl"><span class="ld" style="background:var(--blue)"></span>不安だったこと</div>
   <div class="card">${ta('ax','不安なこと...')}</div>
-  <div class="section-label"><span style="width:6px;height:6px;border-radius:50%;background:#FF9500;display:inline-block"></span> 明日やること</div>
+  <div class="refl-grp-lbl"><span class="ld" style="background:var(--orange)"></span>明日やること</div>
   <div class="card">${ta('tm','明日の目標...')}</div>`;
 
   if(saved&&!reflEdit){
     html+=`<div class="refl-saved-card">
-      <div class="refl-saved-text">✓ 振り返り保存済み</div>
+      <div class="refl-saved-txt">✓ 振り返り保存済み</div>
       <div class="refl-saved-sub">お疲れさまでした</div>
       <button class="refl-edit-btn" id="r-edit">編集する</button>
     </div>`;
-  } else {
+  }else{
     html+=`<button class="refl-save-btn" id="r-save">${saved?'再保存する':'振り返りを保存'}</button>`;
   }
 
   document.getElementById('refl-body').innerHTML=html;
-
-  document.querySelectorAll('.refl-ta').forEach(ta=>{
-    autoH(ta);
-    ta.addEventListener('input',()=>{ autoH(ta); r[ta.dataset.k]=ta.value; save(); });
+  document.querySelectorAll('.refl-ta').forEach(ta2=>{
+    autoH(ta2);
+    ta2.addEventListener('input',()=>{autoH(ta2);r[ta2.dataset.k]=ta2.value;save();});
   });
-  document.getElementById('r-save')?.addEventListener('click',()=>{ d.rs=true; reflEdit=false; save(); renderRefl(); });
-  document.getElementById('r-edit')?.addEventListener('click',()=>{ reflEdit=true; renderRefl(); });
+  document.getElementById('r-save')?.addEventListener('click',()=>{d.rs=true;reflEdit=false;save();renderRefl();});
+  document.getElementById('r-edit')?.addEventListener('click',()=>{reflEdit=true;renderRefl();});
 }
-
-function autoH(ta){ ta.style.height='auto'; ta.style.height=ta.scrollHeight+'px'; }
+function autoH(ta){ta.style.height='auto';ta.style.height=ta.scrollHeight+'px';}
 
 // ── HOME EVENTS ──
 const hb=document.getElementById('home-body');
-hb.addEventListener('click',e2=>{
-  const el=e2.target.closest('[data-a]'); if(!el) return;
-  const a=el.dataset.a, today=todayStr(), d=ds(today);
-  if(a==='fx'){ d.fd[el.dataset.id]=!d.fd[el.dataset.id]; save(); renderHome(); }
-  else if(a==='fr'){ d.fb[+el.dataset.i].done=!d.fb[+el.dataset.i].done; save(); renderHome(); }
-  else if(a==='frd'){ d.fb.splice(+el.dataset.i,1); save(); renderHome(); }
+hb.addEventListener('click',ev=>{
+  const el=ev.target.closest('[data-a]');if(!el)return;
+  const a=el.dataset.a,today=todayStr(),d=ds(today);
+  if(a==='fx'){d.fd[el.dataset.id]=!d.fd[el.dataset.id];save();renderHome();}
+  else if(a==='fr'){d.fb[+el.dataset.i].done=!d.fb[+el.dataset.i].done;save();renderHome();}
+  else if(a==='frd'){d.fb.splice(+el.dataset.i,1);save();renderHome();}
   else if(a==='fra'){
-    d.fb.push({s:'',e:'',l:'',done:false}); save(); renderHome();
-    setTimeout(()=>{ const ins=document.querySelectorAll('[data-a="frs"]'); if(ins.length) ins[ins.length-1].focus(); },60);
+    d.fb.push({s:'',e:'',l:'',done:false});save();renderHome();
+    setTimeout(()=>{const ins=document.querySelectorAll('[data-a="frs"]');if(ins.length)ins[ins.length-1].focus();},60);
   }
-  else if(a==='td'){ d.todos[+el.dataset.i].done=!d.todos[+el.dataset.i].done; save(); renderHome(); }
-  else if(a==='tdd'){ d.todos.splice(+el.dataset.i,1); save(); renderHome(); }
-  else if(a==='tda'){ addTodo(); }
+  else if(a==='td'){d.todos[+el.dataset.i].done=!d.todos[+el.dataset.i].done;save();renderHome();}
+  else if(a==='tdd'){d.todos.splice(+el.dataset.i,1);save();renderHome();}
+  else if(a==='tda'){addTodo();}
 });
-hb.addEventListener('change',e2=>{
-  const el=e2.target, a=el.dataset.a; if(!a) return;
+hb.addEventListener('change',ev=>{
+  const el=ev.target,a=el.dataset.a;if(!a)return;
   const d=ds(todayStr());
-  if(a==='fxt'){ d.ft[el.dataset.id]=el.value; save(); }
-  else if(a==='frs'){ d.fb[+el.dataset.i].s=el.value; save(); }
-  else if(a==='fre'){ d.fb[+el.dataset.i].e=el.value; save(); }
+  if(a==='fxt'){d.ft[el.dataset.id]=el.value;save();renderHome();}
+  else if(a==='frs'){d.fb[+el.dataset.i].s=el.value;save();renderHome();}
+  else if(a==='fre'){d.fb[+el.dataset.i].e=el.value;save();renderHome();}
 });
-hb.addEventListener('input',e2=>{
-  const el=e2.target, a=el.dataset.a; if(!a) return;
+hb.addEventListener('input',ev=>{
+  const el=ev.target,a=el.dataset.a;if(!a)return;
   const d=ds(todayStr());
-  if(a==='frl'){ d.fb[+el.dataset.i].l=el.value; save(); }
-  else if(a==='tdt'){ d.todos[+el.dataset.i].text=el.value; save(); }
+  if(a==='frl'){d.fb[+el.dataset.i].l=el.value;save();}
+  else if(a==='tdt'){d.todos[+el.dataset.i].text=el.value;save();}
 });
-hb.addEventListener('keydown',e2=>{
-  if(e2.key==='Enter'&&e2.target.id==='todo-inp'){ e2.preventDefault(); addTodo(); }
+hb.addEventListener('keydown',ev=>{
+  if(ev.key==='Enter'&&ev.target.id==='todo-inp'){ev.preventDefault();addTodo();}
 });
-
 function addTodo(){
-  const inp=document.getElementById('todo-inp'); if(!inp) return;
-  const txt=inp.value.trim(); if(!txt) return;
-  ds(todayStr()).todos.push({text:txt,done:false}); save(); renderHome();
-  setTimeout(()=>{ const el=document.getElementById('todo-inp'); if(el) el.focus(); },60);
+  const inp=document.getElementById('todo-inp');if(!inp)return;
+  const txt=inp.value.trim();if(!txt)return;
+  ds(todayStr()).todos.push({text:txt,done:false});save();renderHome();
+  setTimeout(()=>{const el=document.getElementById('todo-inp');if(el)el.focus();},60);
 }
 
 // ── NAV ──
@@ -632,32 +582,31 @@ document.querySelectorAll('.nav-btn').forEach(b=>{
     document.querySelectorAll('.nav-btn').forEach(x=>x.classList.toggle('active',x===b));
     document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
     document.getElementById(`screen-${tab}`).classList.add('active');
-    if(tab==='home') renderHome();
-    else if(tab==='refl'){ reflEdit=false; renderRefl(); }
-    else if(tab==='settings') document.getElementById('settings-date').value=S.matchDate||'';
+    if(tab==='home')renderHome();
+    else if(tab==='refl'){reflEdit=false;renderRefl();}
+    else document.getElementById('settings-date').value=S.matchDate||'';
   });
 });
 
 // ── SETTINGS ──
 document.getElementById('settings-save').addEventListener('click',()=>{
-  const v=document.getElementById('settings-date').value; if(!v) return;
-  S.matchDate=v; S.startDate=startFrom(v); save();
+  const v=document.getElementById('settings-date').value;if(!v)return;
+  S.matchDate=v;S.startDate=startFrom(v);save();
   document.querySelector('[data-tab="home"]').click();
 });
 document.getElementById('reset-btn').addEventListener('click',()=>{
-  if(confirm('すべてのデータをリセットしますか？')){ localStorage.removeItem(LS); S={}; showSetup(); }
+  if(confirm('すべてのデータをリセットしますか？')){localStorage.removeItem(LS);S={};showSetup();}
 });
 
 // ── SETUP ──
 document.getElementById('setup-btn').addEventListener('click',()=>{
-  const v=document.getElementById('setup-date').value; if(!v) return;
-  S.matchDate=v; S.startDate=startFrom(v); save(); hideSetup(); renderHome();
+  const v=document.getElementById('setup-date').value;if(!v)return;
+  S.matchDate=v;S.startDate=startFrom(v);save();hideSetup();renderHome();
 });
-
 function showSetup(){
   document.getElementById('setup-screen').style.display='flex';
   document.getElementById('app-screen').classList.remove('show');
-  const def=new Date(); def.setDate(def.getDate()+8);
+  const def=new Date();def.setDate(def.getDate()+8);
   document.getElementById('setup-date').value=dStr(def);
 }
 function hideSetup(){
@@ -666,10 +615,10 @@ function hideSetup(){
 }
 
 // ── INIT ──
-if('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js');
+if('serviceWorker' in navigator)navigator.serviceWorker.register('/sw.js');
 load();
-if(!S.matchDate){ showSetup(); }
-else { hideSetup(); renderHome(); }
+if(!S.matchDate)showSetup();
+else{hideSetup();renderHome();}
 </script>
 </body>
 </html>
