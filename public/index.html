@@ -5,223 +5,303 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="8日間">
-<meta name="theme-color" content="#c0392b">
+<meta name="theme-color" content="#F2F2F7">
 <link rel="manifest" href="/manifest.json">
 <title>試合まで8日間</title>
 <style>
 :root {
-  --red: #e84444;
-  --orange: #f5a623;
-  --grad: linear-gradient(135deg, #e84444 0%, #f5a623 100%);
-  --bg: #f2f2f7;
-  --card: #ffffff;
-  --border: #e8e8ed;
-  --text: #1c1c1e;
-  --sub: #6d6d72;
-  --done-op: 0.35;
-  --radius: 16px;
-  --tab-h: 60px;
-  --safe-b: env(safe-area-inset-bottom, 0px);
-  --safe-t: env(safe-area-inset-top, 0px);
+  --bg:        #F2F2F7;
+  --card:      #FFFFFF;
+  --sep:       #E5E5EA;
+  --sep2:      #F2F2F7;
+  --text:      #1C1C1E;
+  --sub:       #8E8E93;
+  --sub2:      #AEAEB2;
+  --accent:    #FF3B30;
+  --accent2:   #FF6B6B;
+  --fill:      #F2F2F7;
+  --fill2:     #E5E5EA;
+  --done-op:   0.28;
+  --r:         12px;
+  --r-sm:      8px;
+  --safe-t:    env(safe-area-inset-top, 0px);
+  --safe-b:    env(safe-area-inset-bottom, 0px);
+  --tab-h:     56px;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; }
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Helvetica Neue', sans-serif;
   background: var(--bg);
   color: var(--text);
-  min-height: 100vh;
-  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
 }
 
-/* ── Setup ── */
-#setup-screen { position: fixed; inset: 0; z-index: 999; background: var(--grad); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 28px; padding-top: calc(40px + var(--safe-t)); }
-.setup-logo { font-size: 52px; margin-bottom: 16px; }
-.setup-title { color: #fff; font-size: 28px; font-weight: 800; text-align: center; margin-bottom: 6px; letter-spacing: -0.5px; }
-.setup-sub { color: rgba(255,255,255,.8); font-size: 15px; text-align: center; margin-bottom: 44px; }
-.setup-card { background: #fff; border-radius: 20px; padding: 24px; width: 100%; max-width: 360px; box-shadow: 0 8px 32px rgba(0,0,0,.18); }
-.setup-card label { display: block; font-size: 13px; font-weight: 700; color: var(--sub); margin-bottom: 10px; letter-spacing: .3px; }
-.setup-card input[type=date] { width: 100%; padding: 14px 16px; border-radius: 12px; border: 2px solid var(--border); font-size: 17px; color: var(--text); background: var(--bg); outline: none; margin-bottom: 20px; font-family: inherit; }
-.setup-card input[type=date]:focus { border-color: var(--red); }
-.setup-start { width: 100%; padding: 16px; border-radius: 14px; border: none; background: var(--grad); color: #fff; font-size: 17px; font-weight: 700; cursor: pointer; letter-spacing: .3px; }
+/* ── SETUP ── */
+#setup-screen {
+  position: fixed; inset: 0; z-index: 200;
+  background: var(--bg);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 40px 28px;
+  padding-top: calc(40px + var(--safe-t));
+}
+.setup-icon { font-size: 56px; margin-bottom: 24px; }
+.setup-h { font-size: 28px; font-weight: 700; color: var(--text); letter-spacing: -.5px; margin-bottom: 6px; }
+.setup-p { font-size: 15px; color: var(--sub); margin-bottom: 44px; }
+.setup-form { width: 100%; max-width: 340px; }
+.setup-label { font-size: 12px; font-weight: 600; color: var(--sub); letter-spacing: .4px; text-transform: uppercase; margin-bottom: 8px; display: block; }
+.setup-date-input {
+  width: 100%; padding: 14px 16px; border-radius: var(--r);
+  border: 1.5px solid var(--sep); background: var(--card);
+  font-size: 17px; color: var(--text); outline: none; font-family: inherit; margin-bottom: 16px;
+}
+.setup-date-input:focus { border-color: var(--accent); }
+.setup-btn {
+  width: 100%; padding: 16px; border-radius: var(--r);
+  background: var(--accent); border: none;
+  color: #fff; font-size: 17px; font-weight: 600; cursor: pointer; font-family: inherit;
+}
 
-/* ── App shell ── */
-#app-screen { display: none; }
+/* ── APP SHELL ── */
+#app-screen { display: none; min-height: 100vh; }
 #app-screen.show { display: block; }
-.screen { display: none; padding-bottom: calc(var(--tab-h) + var(--safe-b) + 16px); }
+.screen { display: none; min-height: 100vh; padding-bottom: calc(var(--tab-h) + var(--safe-b) + 8px); }
 .screen.active { display: block; }
 
-/* ── Header ── */
-.app-header {
-  background: var(--grad);
-  padding: 20px 20px 28px;
+/* ── PAGE HEADER (home) ── */
+.home-header {
+  background: var(--card);
+  padding: 16px 20px 20px;
   padding-top: calc(16px + var(--safe-t));
-  position: relative;
+  border-bottom: 1px solid var(--sep);
 }
-.header-top { display: flex; justify-content: space-between; align-items: flex-start; }
-.header-date-label { color: rgba(255,255,255,.75); font-size: 12px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; }
-.header-date { color: #fff; font-size: 22px; font-weight: 800; margin-top: 2px; letter-spacing: -0.3px; }
-.header-day-badge { background: rgba(255,255,255,.25); border-radius: 20px; padding: 5px 14px; color: #fff; font-size: 13px; font-weight: 700; white-space: nowrap; margin-top: 4px; }
-.countdown-row { margin-top: 12px; display: flex; align-items: baseline; gap: 4px; }
-.countdown-num { color: #fff; font-size: 60px; font-weight: 900; line-height: 1; letter-spacing: -2px; }
-.countdown-unit { color: rgba(255,255,255,.9); font-size: 20px; font-weight: 700; }
-.countdown-match { color: rgba(255,255,255,.75); font-size: 13px; margin-top: 6px; }
+.hdr-row1 { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
+.hdr-date-label { font-size: 11px; font-weight: 600; color: var(--sub); letter-spacing: .8px; text-transform: uppercase; margin-bottom: 3px; }
+.hdr-date { font-size: 20px; font-weight: 700; color: var(--text); letter-spacing: -.3px; }
+.day-pill {
+  background: var(--fill); border-radius: 20px;
+  padding: 5px 12px; font-size: 12px; font-weight: 600; color: var(--sub);
+  white-space: nowrap;
+}
+.countdown-block { display: flex; align-items: baseline; gap: 4px; }
+.count-num { font-size: 52px; font-weight: 800; color: var(--text); line-height: 1; letter-spacing: -2px; }
+.count-unit { font-size: 17px; font-weight: 500; color: var(--sub); }
+.count-sub { font-size: 13px; color: var(--sub2); margin-top: 4px; }
 
-/* ── Theme card ── */
-.theme-card {
-  margin: -16px 16px 0;
-  background: #fff;
-  border-radius: var(--radius);
-  padding: 16px 18px;
-  box-shadow: 0 4px 20px rgba(0,0,0,.1);
+/* ── THEME ROW ── */
+.theme-row {
+  margin: 12px 16px 0;
+  background: var(--card); border-radius: var(--r);
+  padding: 14px 16px;
   display: flex; align-items: center; gap: 14px;
+  box-shadow: 0 1px 3px rgba(0,0,0,.06);
 }
-.theme-icon { font-size: 32px; flex-shrink: 0; }
-.theme-day-label { font-size: 11px; font-weight: 700; color: var(--red); letter-spacing: .5px; text-transform: uppercase; }
-.theme-text { font-size: 16px; font-weight: 700; color: var(--text); margin-top: 3px; }
+.theme-emoji { font-size: 28px; flex-shrink: 0; }
+.theme-body {}
+.theme-label { font-size: 11px; font-weight: 600; color: var(--accent); letter-spacing: .5px; text-transform: uppercase; margin-bottom: 3px; }
+.theme-text { font-size: 15px; font-weight: 600; color: var(--text); }
 
-/* ── Page content ── */
-.page-content { padding: 16px 16px 0; }
-
-/* ── Section card ── */
-.scard { background: var(--card); border-radius: var(--radius); margin-bottom: 14px; overflow: hidden; box-shadow: 0 2px 12px rgba(0,0,0,.06); }
-.scard-header { display: flex; align-items: center; gap: 10px; padding: 14px 16px; border-bottom: 1px solid var(--border); }
-.scard-icon { font-size: 18px; }
-.scard-title { font-size: 15px; font-weight: 700; color: var(--text); flex: 1; }
-.scard-badge { background: var(--grad); border-radius: 20px; padding: 3px 10px; color: #fff; font-size: 11px; font-weight: 700; }
-
-/* ── Fixed schedule items ── */
-.sched-row { display: flex; align-items: center; gap: 12px; padding: 13px 16px; border-bottom: 1px solid var(--border); transition: opacity .2s; }
-.sched-row:last-child { border-bottom: none; }
-.sched-row.done { opacity: var(--done-op); }
-.check-circle { width: 26px; height: 26px; border-radius: 50%; border: 2.5px solid #ddd; flex-shrink: 0; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all .2s; }
-.check-circle.on { background: var(--grad); border-color: transparent; }
-.check-circle.on::after { content: '✓'; color: #fff; font-size: 13px; font-weight: 800; }
-.check-sq { width: 24px; height: 24px; border-radius: 7px; border: 2.5px solid #ddd; flex-shrink: 0; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all .2s; }
-.check-sq.on { background: var(--orange); border-color: transparent; }
-.check-sq.on::after { content: '✓'; color: #fff; font-size: 12px; font-weight: 800; }
-.sched-time-wrap { flex-shrink: 0; }
-.time-pill {
-  background: var(--bg);
-  border: none;
-  border-radius: 10px;
-  padding: 6px 10px;
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--sub);
-  cursor: pointer;
-  outline: none;
-  font-family: inherit;
-  text-align: center;
-  width: 96px;
+/* ── SECTION ── */
+.page-body { padding: 8px 16px 0; }
+.section-label {
+  font-size: 12px; font-weight: 600; color: var(--sub);
+  letter-spacing: .4px; text-transform: uppercase;
+  padding: 16px 4px 6px;
 }
-.time-pill:focus { background: #fff3e0; color: var(--red); }
-.sched-label { flex: 1; font-size: 15px; color: var(--text); }
-.done .sched-label { text-decoration: line-through; }
+.card { background: var(--card); border-radius: var(--r); overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,.06); }
 
-/* ── Free blocks ── */
-.free-row { display: flex; align-items: center; gap: 10px; padding: 12px 16px; border-bottom: 1px solid var(--border); }
-.free-row:last-of-type { border-bottom: none; }
-.free-row.done { opacity: var(--done-op); }
-.free-times { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
-.free-time-input {
-  background: var(--bg); border: none; border-radius: 10px;
-  padding: 7px 6px; font-size: 13px; font-weight: 600; color: var(--sub);
-  width: 72px; text-align: center; outline: none; font-family: inherit; cursor: pointer;
+/* ── ROWS ── */
+.row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 13px 16px; border-bottom: 1px solid var(--sep);
+  transition: opacity .18s;
 }
-.free-time-input:focus { background: #fff3e0; color: var(--red); }
-.time-sep { font-size: 12px; color: #ccc; font-weight: 700; }
-.free-label-input { flex: 1; border: none; background: transparent; font-size: 15px; color: var(--text); outline: none; min-width: 0; font-family: inherit; }
-.free-label-input::placeholder { color: #ccc; }
-.del-btn { background: none; border: none; color: #ccc; font-size: 22px; cursor: pointer; padding: 0 2px; flex-shrink: 0; line-height: 1; }
-.del-btn:active { color: var(--red); }
-.add-block-btn { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 14px; font-size: 15px; font-weight: 600; color: var(--red); background: none; border: none; cursor: pointer; width: 100%; }
+.row:last-child { border-bottom: none; }
+.row.done { opacity: var(--done-op); }
 
-/* ── Todo ── */
-.todo-row { display: flex; align-items: center; gap: 12px; padding: 13px 16px; border-bottom: 1px solid var(--border); }
-.todo-row:last-of-type { border-bottom: none; }
-.todo-row.done { opacity: var(--done-op); }
-.todo-input-field { flex: 1; border: none; background: transparent; font-size: 15px; color: var(--text); outline: none; font-family: inherit; min-width: 0; }
-.todo-input-field.done { text-decoration: line-through; }
-.todo-add-wrap { display: flex; gap: 10px; padding: 12px 16px; border-top: 1px solid var(--border); }
-.todo-new-input { flex: 1; background: var(--bg); border: none; border-radius: 12px; padding: 12px 16px; font-size: 15px; outline: none; font-family: inherit; }
-.todo-new-input:focus { background: #fff3e0; }
-.add-btn { background: var(--grad); border: none; border-radius: 12px; padding: 12px 18px; color: #fff; font-size: 15px; font-weight: 700; cursor: pointer; flex-shrink: 0; }
-
-/* ── Streak ── */
-.streak-wrap { padding: 16px 16px 4px; }
-.streak-dots { display: flex; gap: 6px; justify-content: center; }
-.streak-dot {
-  flex: 1; max-width: 36px; aspect-ratio: 1;
-  border-radius: 50%;
-  background: var(--border);
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  font-size: 10px; font-weight: 700; color: #bbb;
-  transition: all .25s;
-  position: relative;
+/* check circle */
+.chk {
+  width: 24px; height: 24px; border-radius: 50%;
+  border: 2px solid var(--sep2); flex-shrink: 0; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all .18s; background: var(--fill);
 }
-.streak-dot.filled { background: var(--grad); color: #fff; box-shadow: 0 3px 10px rgba(232,68,68,.35); }
-.streak-dot.today { box-shadow: 0 0 0 3px var(--orange), 0 3px 10px rgba(232,68,68,.3); }
-.streak-dot.today:not(.filled) { color: var(--red); background: #fff; }
-.dot-n { font-size: 9px; line-height: 1.2; }
-.dot-e { font-size: 13px; line-height: 1; }
-.streak-stat { text-align: center; padding: 10px 16px 16px; font-size: 13px; color: var(--sub); }
-.streak-stat b { color: var(--red); }
+.chk.on { background: var(--accent); border-color: var(--accent); }
+.chk.on::after { content: ''; display: block; width: 6px; height: 10px; border: 2.5px solid #fff; border-top: none; border-left: none; transform: rotate(45deg) translate(-1px,-1px); }
 
-/* ── Reflection screen ── */
-.refl-screen { padding: 0; }
-.refl-header { background: var(--grad); padding: 20px 20px 24px; padding-top: calc(16px + var(--safe-t)); }
-.refl-header-title { color: #fff; font-size: 22px; font-weight: 800; }
-.refl-header-sub { color: rgba(255,255,255,.8); font-size: 14px; margin-top: 4px; }
-.refl-content { padding: 16px 16px 0; }
-.refl-group { margin-bottom: 14px; }
-.refl-group-label { font-size: 12px; font-weight: 700; color: var(--sub); letter-spacing: .4px; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
-.refl-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-.refl-dot.g { background: #34c759; }
-.refl-dot.b { background: #007aff; }
-.refl-dot.o { background: var(--orange); }
-.refl-items { background: var(--card); border-radius: var(--radius); overflow: hidden; box-shadow: 0 2px 12px rgba(0,0,0,.06); }
-.refl-item { display: flex; align-items: flex-start; padding: 14px 16px; gap: 10px; border-bottom: 1px solid var(--border); }
-.refl-item:last-child { border-bottom: none; }
-.refl-item-num { font-size: 13px; font-weight: 700; color: var(--sub); flex-shrink: 0; padding-top: 1px; }
-.refl-textarea {
+/* check square */
+.chk-sq {
+  width: 24px; height: 24px; border-radius: 6px;
+  border: 2px solid var(--sep2); flex-shrink: 0; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all .18s; background: var(--fill);
+}
+.chk-sq.on { background: var(--accent); border-color: var(--accent); }
+.chk-sq.on::after { content: ''; display: block; width: 6px; height: 10px; border: 2.5px solid #fff; border-top: none; border-left: none; transform: rotate(45deg) translate(-1px,-1px); }
+
+/* time input */
+.t-input {
+  background: var(--fill); border: none; border-radius: var(--r-sm);
+  padding: 6px 10px; font-size: 13px; font-weight: 500; color: var(--sub);
+  cursor: pointer; outline: none; font-family: inherit; text-align: center;
+  -webkit-appearance: none; min-width: 68px;
+}
+.t-input::-webkit-calendar-picker-indicator { opacity: 0; position: absolute; width: 100%; height: 100%; }
+.t-input:focus, .t-input:active { background: var(--sep); color: var(--text); }
+.t-sep { font-size: 12px; color: var(--sub2); flex-shrink: 0; }
+
+.row-label { flex: 1; font-size: 15px; color: var(--text); line-height: 1.3; }
+.row.done .row-label { text-decoration: line-through; color: var(--sub); }
+
+.free-label-inp {
   flex: 1; border: none; background: transparent; font-size: 15px; color: var(--text);
-  resize: none; outline: none; font-family: inherit; line-height: 1.5; min-height: 24px;
+  outline: none; font-family: inherit; min-width: 0;
 }
-.refl-textarea::placeholder { color: #ccc; }
-.refl-save-btn { width: 100%; padding: 16px; border-radius: 14px; border: none; background: var(--grad); color: #fff; font-size: 17px; font-weight: 700; cursor: pointer; margin: 16px 0; box-shadow: 0 4px 16px rgba(232,68,68,.3); }
-.refl-saved-wrap { background: var(--card); border-radius: var(--radius); padding: 14px 16px; text-align: center; margin-bottom: 14px; box-shadow: 0 2px 12px rgba(0,0,0,.06); }
-.refl-saved-badge { color: #34c759; font-size: 15px; font-weight: 700; }
-.refl-edit-btn { background: none; border: none; color: var(--sub); font-size: 13px; cursor: pointer; margin-top: 6px; text-decoration: underline; }
+.free-label-inp::placeholder { color: var(--sub2); }
 
-/* ── Settings screen ── */
-.settings-header { background: var(--grad); padding: 20px 20px 28px; padding-top: calc(16px + var(--safe-t)); }
-.settings-header-title { color: #fff; font-size: 22px; font-weight: 800; }
-.settings-content { padding: 16px; }
-.settings-card { background: var(--card); border-radius: var(--radius); padding: 16px; box-shadow: 0 2px 12px rgba(0,0,0,.06); margin-bottom: 14px; }
-.settings-label { font-size: 12px; font-weight: 700; color: var(--sub); letter-spacing: .4px; margin-bottom: 10px; }
-.settings-input { width: 100%; padding: 13px 14px; border-radius: 12px; border: 2px solid var(--border); font-size: 16px; color: var(--text); background: var(--bg); outline: none; font-family: inherit; }
-.settings-input:focus { border-color: var(--red); }
-.settings-save { width: 100%; padding: 14px; border-radius: 12px; border: none; background: var(--grad); color: #fff; font-size: 16px; font-weight: 700; cursor: pointer; margin-top: 10px; }
-.settings-reset { width: 100%; padding: 13px; border-radius: 12px; border: 2px solid var(--border); background: #fff; color: #ff3b30; font-size: 15px; font-weight: 600; cursor: pointer; }
+.del-btn {
+  background: none; border: none; color: var(--sub2);
+  font-size: 18px; cursor: pointer; padding: 4px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  width: 28px; height: 28px; border-radius: 50%;
+}
+.del-btn:active { background: var(--fill); color: var(--accent); }
 
-/* ── Bottom nav ── */
+/* add button */
+.add-row {
+  display: flex; align-items: center; justify-content: center;
+  padding: 13px 16px; gap: 6px; cursor: pointer;
+  background: none; border: none; width: 100%;
+  font-size: 15px; font-weight: 500; color: var(--accent); font-family: inherit;
+}
+
+/* progress pill */
+.prog-pill {
+  background: var(--fill); border-radius: 20px; padding: 3px 10px;
+  font-size: 12px; font-weight: 600; color: var(--sub);
+}
+.prog-pill.complete { background: rgba(255,59,48,.1); color: var(--accent); }
+.card-header {
+  display: flex; align-items: center; gap: 10px;
+  padding: 12px 16px; border-bottom: 1px solid var(--sep);
+}
+.card-header-icon { font-size: 16px; }
+.card-header-title { font-size: 14px; font-weight: 600; color: var(--text); flex: 1; }
+
+/* todo add */
+.todo-add-wrap { display: flex; gap: 10px; padding: 12px 16px; border-top: 1px solid var(--sep); }
+.todo-new-inp {
+  flex: 1; background: var(--fill); border: none; border-radius: var(--r-sm);
+  padding: 10px 14px; font-size: 15px; outline: none; font-family: inherit; color: var(--text);
+}
+.todo-new-inp:focus { background: var(--sep); }
+.todo-new-inp::placeholder { color: var(--sub2); }
+.todo-add-btn {
+  background: var(--accent); border: none; border-radius: var(--r-sm);
+  padding: 10px 18px; color: #fff; font-size: 15px; font-weight: 600;
+  cursor: pointer; flex-shrink: 0; font-family: inherit;
+}
+.todo-inp {
+  flex: 1; border: none; background: transparent; font-size: 15px;
+  color: var(--text); outline: none; font-family: inherit; min-width: 0;
+}
+.todo-inp.done { text-decoration: line-through; color: var(--sub); }
+
+/* ── STREAK ── */
+.streak-wrap { padding: 12px 16px 16px; }
+.streak-dots { display: flex; gap: 6px; }
+.s-dot {
+  flex: 1; aspect-ratio: 1; border-radius: 50%;
+  background: var(--fill); border: 1.5px solid var(--sep);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  font-size: 9px; font-weight: 700; color: var(--sub2); transition: all .2s;
+}
+.s-dot.today { border-color: var(--accent); color: var(--accent); background: rgba(255,59,48,.06); }
+.s-dot.done { background: var(--accent); border-color: var(--accent); color: #fff; box-shadow: 0 2px 8px rgba(255,59,48,.25); }
+.s-dot .dn { font-size: 8px; }
+.s-dot .de { font-size: 11px; }
+.streak-stat { text-align: center; font-size: 13px; color: var(--sub); margin-top: 10px; }
+.streak-stat b { color: var(--accent); font-weight: 700; }
+
+/* ── BOTTOM NAV ── */
 .bottom-nav {
   position: fixed; bottom: 0; left: 0; right: 0;
-  background: rgba(255,255,255,.95);
+  background: rgba(255,255,255,.92);
   -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px);
-  border-top: 1px solid var(--border);
+  border-top: .5px solid var(--sep);
   display: flex;
   height: calc(var(--tab-h) + var(--safe-b));
   padding-bottom: var(--safe-b);
   z-index: 100;
 }
-.nav-tab { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; border: none; background: none; cursor: pointer; color: #aaa; font-size: 10px; font-weight: 600; letter-spacing: .2px; padding: 0; }
-.nav-tab.active { color: var(--red); }
-.nav-tab .ni { font-size: 24px; line-height: 1; }
+.nav-btn {
+  flex: 1; display: flex; flex-direction: column; align-items: center;
+  justify-content: center; gap: 3px; border: none; background: none;
+  cursor: pointer; color: var(--sub2); font-size: 10px; font-weight: 500;
+  letter-spacing: .1px; padding: 6px 0 0;
+}
+.nav-btn .ni { font-size: 22px; line-height: 1; }
+.nav-btn.active { color: var(--accent); }
 
-/* ── Utils ── */
+/* ── REFLECTION SCREEN ── */
+.screen-header {
+  background: var(--card);
+  padding: 16px 20px 18px;
+  padding-top: calc(16px + var(--safe-t));
+  border-bottom: 1px solid var(--sep);
+}
+.screen-title { font-size: 20px; font-weight: 700; color: var(--text); letter-spacing: -.3px; }
+.screen-sub { font-size: 13px; color: var(--sub); margin-top: 3px; }
+
+.refl-group-lbl {
+  font-size: 11px; font-weight: 600; color: var(--sub);
+  letter-spacing: .5px; text-transform: uppercase;
+  padding: 16px 4px 6px; display: flex; align-items: center; gap: 6px;
+}
+.lbl-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+.lbl-dot.g { background: #34C759; }
+.lbl-dot.b { background: #007AFF; }
+.lbl-dot.o { background: #FF9500; }
+
+.refl-item {
+  display: flex; align-items: flex-start;
+  padding: 14px 16px; gap: 12px; border-bottom: 1px solid var(--sep);
+}
+.refl-item:last-child { border-bottom: none; }
+.refl-num { font-size: 13px; font-weight: 600; color: var(--sub); min-width: 14px; padding-top: 2px; }
+.refl-ta {
+  flex: 1; border: none; background: transparent; font-size: 15px;
+  color: var(--text); resize: none; outline: none; font-family: inherit;
+  line-height: 1.5; min-height: 22px; overflow: hidden;
+}
+.refl-ta::placeholder { color: var(--sub2); }
+.refl-ta[readonly] { color: var(--sub); }
+
+.refl-save-btn {
+  width: 100%; padding: 15px; border-radius: var(--r);
+  background: var(--accent); border: none; color: #fff;
+  font-size: 16px; font-weight: 600; cursor: pointer; font-family: inherit;
+  margin-top: 8px;
+}
+.refl-saved-card {
+  background: var(--card); border-radius: var(--r);
+  padding: 16px; text-align: center;
+  box-shadow: 0 1px 3px rgba(0,0,0,.06); margin-top: 8px;
+}
+.refl-saved-text { font-size: 15px; font-weight: 600; color: #34C759; }
+.refl-saved-sub { font-size: 13px; color: var(--sub); margin-top: 4px; }
+.refl-edit-btn {
+  background: none; border: none; color: var(--sub); font-size: 13px;
+  cursor: pointer; text-decoration: underline; margin-top: 8px; font-family: inherit;
+}
+
+/* ── SETTINGS ── */
+.settings-body { padding: 8px 16px 0; }
+
+/* ── UTIL ── */
 .hidden { display: none !important; }
 </style>
 </head>
@@ -229,13 +309,13 @@ body {
 
 <!-- Setup -->
 <div id="setup-screen">
-  <div class="setup-logo">🔥</div>
-  <div class="setup-title">試合まで8日間</div>
-  <div class="setup-sub">試合日を設定してスタートしよう</div>
-  <div class="setup-card">
-    <label>試合日を選択</label>
-    <input type="date" id="setup-date">
-    <button class="setup-start" id="setup-btn">スタートする →</button>
+  <div class="setup-icon">⏱</div>
+  <div class="setup-h">試合まで8日間</div>
+  <div class="setup-p">試合日を設定してスタートしよう</div>
+  <div class="setup-form">
+    <label class="setup-label">試合日</label>
+    <input type="date" class="setup-date-input" id="setup-date">
+    <button class="setup-btn" id="setup-btn">はじめる</button>
   </div>
 </div>
 
@@ -244,447 +324,352 @@ body {
 
   <!-- HOME -->
   <div class="screen active" id="screen-home">
-    <div class="app-header" id="home-header"></div>
-    <div class="theme-card" id="theme-card"></div>
-    <div class="page-content" id="home-content"></div>
+    <div class="home-header" id="home-header"></div>
+    <div class="theme-row" id="theme-row"></div>
+    <div class="page-body" id="home-body"></div>
   </div>
 
   <!-- REFLECTION -->
-  <div class="screen refl-screen" id="screen-refl">
-    <div class="refl-header" id="refl-header"></div>
-    <div class="refl-content" id="refl-content"></div>
+  <div class="screen" id="screen-refl">
+    <div class="screen-header" id="refl-header"></div>
+    <div class="page-body" id="refl-body"></div>
   </div>
 
   <!-- SETTINGS -->
   <div class="screen" id="screen-settings">
-    <div class="settings-header"><div class="settings-header-title">⚙️ 設定</div></div>
-    <div class="settings-content">
-      <div class="settings-card">
-        <div class="settings-label">試合日</div>
-        <input type="date" class="settings-input" id="settings-date">
-        <button class="settings-save" id="settings-save-btn">保存する</button>
+    <div class="screen-header">
+      <div class="screen-title">設定</div>
+    </div>
+    <div class="settings-body">
+      <div class="section-label">試合日</div>
+      <div class="card" style="padding:16px">
+        <input type="date" class="setup-date-input" id="settings-date" style="margin-bottom:12px">
+        <button class="setup-btn" id="settings-save">保存する</button>
       </div>
-      <div class="settings-card">
-        <div class="settings-label">リセット</div>
-        <button class="settings-reset" id="reset-btn">すべてのデータをリセット</button>
+      <div class="section-label">データ</div>
+      <div class="card">
+        <button class="row" style="border:none;background:none;width:100%;cursor:pointer;color:#FF3B30;font-size:15px;font-family:inherit;justify-content:center" id="reset-btn">
+          すべてのデータをリセット
+        </button>
       </div>
     </div>
   </div>
 
   <!-- Nav -->
   <nav class="bottom-nav">
-    <button class="nav-tab active" data-tab="home"><span class="ni">🏠</span>ホーム</button>
-    <button class="nav-tab" data-tab="refl"><span class="ni">🌙</span>振り返り</button>
-    <button class="nav-tab" data-tab="settings"><span class="ni">⚙️</span>設定</button>
+    <button class="nav-btn active" data-tab="home"><span class="ni">🏠</span>ホーム</button>
+    <button class="nav-btn" data-tab="refl"><span class="ni">🌙</span>振り返り</button>
+    <button class="nav-btn" data-tab="settings"><span class="ni">⚙️</span>設定</button>
   </nav>
 </div>
 
 <script>
-const LS = 'match8day_v2';
-const THEMES = ['基礎を固める日','体を動かす日','イメトレをする日','弱点を克服する日','チームと連携する日','メンタルを整える日','コンディションを上げる日','本番のつもりで臨む日'];
-const FIXED_DEF = [
-  { id:'wake',  label:'起床',                  def:'08:00' },
-  { id:'jog',   label:'ジョギング',             def:'08:30' },
-  { id:'clean', label:'片付け',                 def:'09:00' },
-  { id:'plan',  label:'やることリスト作成',      def:'10:00' },
-  { id:'night', label:'シャワー・夜ご飯・洗濯',  def:'21:00' },
-  { id:'sleep', label:'就寝',                   def:'23:00' },
+// ── constants ──
+const LS = 'match8day_v3';
+const THEMES = [
+  ['🏃','基礎を固める日'],['💪','体を動かす日'],['🧠','イメトレをする日'],
+  ['⚡','弱点を克服する日'],['🤝','チームと連携する日'],['🧘','メンタルを整える日'],
+  ['🔥','コンディションを上げる日'],['🏆','本番のつもりで臨む日'],
+];
+const FX = [
+  {id:'wake',  label:'起床',               def:'08:00'},
+  {id:'jog',   label:'ジョギング',          def:'08:30'},
+  {id:'clean', label:'片付け',              def:'09:00'},
+  {id:'plan',  label:'やることリスト作成',   def:'10:00'},
+  {id:'night', label:'シャワー・夜ご飯・洗濯',def:'21:00'},
+  {id:'sleep', label:'就寝',               def:'23:00'},
 ];
 
-let state = {};
-let tab = 'home';
-let reflEditMode = false;
+// ── state ──
+let S = {}, tab = 'home', reflEdit = false;
 
-// ── storage ──
-function load() { try { state = JSON.parse(localStorage.getItem(LS)) || {}; } catch { state = {}; } }
-function save() { localStorage.setItem(LS, JSON.stringify(state)); }
+function load(){ try{ S = JSON.parse(localStorage.getItem(LS))||{}; }catch{ S={}; } }
+function save(){ localStorage.setItem(LS, JSON.stringify(S)); }
 
-// ── date utils ──
-function todayStr() {
+// ── date helpers ──
+function todayStr(){
   const d = new Date();
   return `${d.getFullYear()}-${p2(d.getMonth()+1)}-${p2(d.getDate())}`;
 }
-function p2(n) { return String(n).padStart(2,'0'); }
-function parseLocal(s) { const [y,m,d] = s.split('-').map(Number); return new Date(y,m-1,d); }
-function dStr(d) { return `${d.getFullYear()}-${p2(d.getMonth()+1)}-${p2(d.getDate())}`; }
-function jaDate(s) {
-  const d = parseLocal(s);
-  const w = ['日','月','火','水','木','金','土'][d.getDay()];
+function p2(n){ return String(n).padStart(2,'0'); }
+function parseL(s){ const [y,m,d]=s.split('-').map(Number); return new Date(y,m-1,d); }
+function dStr(d){ return `${d.getFullYear()}-${p2(d.getMonth()+1)}-${p2(d.getDate())}`; }
+function jaDate(s){
+  const d=parseL(s), w=['日','月','火','水','木','金','土'][d.getDay()];
   return `${d.getMonth()+1}月${d.getDate()}日（${w}）`;
 }
-function daysLeft() {
-  const today = parseLocal(todayStr());
-  const match = parseLocal(state.matchDate);
-  return Math.ceil((match - today) / 86400000);
+function daysLeft(){ return Math.ceil((parseL(S.matchDate)-parseL(todayStr()))/86400000); }
+function dayIdx(){
+  if(!S.startDate) return 1;
+  const diff=Math.ceil((parseL(todayStr())-parseL(S.startDate))/86400000);
+  return Math.max(1,Math.min(8,diff+1));
 }
-function dayIdx() {
-  if (!state.startDate) return 1;
-  const diff = Math.ceil((parseLocal(todayStr()) - parseLocal(state.startDate)) / 86400000);
-  return Math.max(1, Math.min(8, diff + 1));
+function startFrom(ms){
+  const d=parseL(ms); d.setDate(d.getDate()-7); return dStr(d);
 }
-function startFrom(matchStr) {
-  const m = parseLocal(matchStr);
-  m.setDate(m.getDate() - 7);
-  return dStr(m);
+function get8(){
+  if(!S.startDate) return [];
+  const s=parseL(S.startDate);
+  return Array.from({length:8},(_,i)=>{ const d=new Date(s); d.setDate(d.getDate()+i); return dStr(d); });
 }
-function get8Days() {
-  if (!state.startDate) return [];
-  const s = parseLocal(state.startDate);
-  return Array.from({length:8}, (_,i) => { const d = new Date(s); d.setDate(d.getDate()+i); return dStr(d); });
-}
-function dayState(dateStr) {
-  if (!state.days) state.days = {};
-  if (!state.days[dateStr]) state.days[dateStr] = {};
-  const d = state.days[dateStr];
-  if (!d.fixedTimes) d.fixedTimes = {};
-  if (!d.fixedDone) d.fixedDone = {};
-  if (!d.freeBlocks) d.freeBlocks = [];
-  if (!d.todos) d.todos = [];
-  if (!d.refl) d.refl = { done1:'',done2:'',done3:'',anxiety:'',tomorrow:'' };
-  if (d.reflSaved === undefined) d.reflSaved = false;
+function ds(date){
+  if(!S.days) S.days={};
+  if(!S.days[date]) S.days[date]={};
+  const d=S.days[date];
+  if(!d.ft) d.ft={};
+  if(!d.fd) d.fd={};
+  if(!d.fb) d.fb=[];
+  if(!d.todos) d.todos=[];
+  if(!d.refl) d.refl={d1:'',d2:'',d3:'',ax:'',tm:''};
+  if(d.rs===undefined) d.rs=false;
   return d;
 }
 
-// ── render home ──
-function renderHome() {
-  const today = todayStr();
-  const d = dayState(today);
-  const left = Math.max(0, daysLeft());
-  const n = dayIdx();
-  const theme = THEMES[Math.min(n-1, 7)];
+function e(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
-  // header
-  document.getElementById('home-header').innerHTML = `
-    <div class="header-top">
+// ── RENDER HOME ──
+function renderHome(){
+  const today=todayStr(), d=ds(today);
+  const left=Math.max(0,daysLeft()), n=dayIdx();
+  const [ti,tt]=THEMES[Math.min(n-1,7)];
+
+  document.getElementById('home-header').innerHTML=`
+    <div class="hdr-row1">
       <div>
-        <div class="header-date-label">TODAY</div>
-        <div class="header-date">${jaDate(today)}</div>
+        <div class="hdr-date-label">TODAY</div>
+        <div class="hdr-date">${jaDate(today)}</div>
       </div>
-      <div class="header-day-badge">DAY ${n} / 8</div>
+      <div class="day-pill">DAY ${n} / 8</div>
     </div>
-    <div class="countdown-row">
-      <span class="countdown-num">${left}</span>
-      <span class="countdown-unit"> 日後</span>
+    <div class="countdown-block">
+      <span class="count-num">${left}</span>
+      <span class="count-unit"> 日後</span>
     </div>
-    <div class="countdown-match">試合: ${jaDate(state.matchDate)}</div>`;
+    <div class="count-sub">試合: ${jaDate(S.matchDate)}</div>`;
 
-  // theme
-  const themeIcons = ['🏃','💪','🧠','⚡','🤝','🧘','🔥','🏆'];
-  document.getElementById('theme-card').innerHTML = `
-    <div class="theme-icon">${themeIcons[n-1]}</div>
-    <div><div class="theme-day-label">TODAY'S THEME</div><div class="theme-text">${theme}</div></div>`;
+  document.getElementById('theme-row').innerHTML=`
+    <div class="theme-emoji">${ti}</div>
+    <div class="theme-body">
+      <div class="theme-label">TODAY'S THEME</div>
+      <div class="theme-text">${tt}</div>
+    </div>`;
 
-  // content
-  let html = '';
+  let html='';
 
   // fixed schedule
-  const fixedDone = FIXED_DEF.filter(f => d.fixedDone[f.id]).length;
-  html += `<div class="scard">
-    <div class="scard-header">
-      <span class="scard-icon">📋</span>
-      <span class="scard-title">固定スケジュール</span>
-      <span class="scard-badge">${fixedDone}/${FIXED_DEF.length}</span>
-    </div>`;
-  FIXED_DEF.forEach(f => {
-    const done = !!d.fixedDone[f.id];
-    const time = d.fixedTimes[f.id] || f.def;
-    html += `<div class="sched-row${done?' done':''}">
-      <div class="check-circle${done?' on':''}" data-a="fx-check" data-id="${f.id}"></div>
-      <div class="sched-time-wrap">
-        <input class="time-pill" type="time" value="${time}" data-a="fx-time" data-id="${f.id}">
+  const fxDone=FX.filter(f=>d.fd[f.id]).length;
+  const fxAll=FX.length;
+  html+=`<div class="section-label">固定スケジュール</div>
+  <div class="card">`;
+  FX.forEach(f=>{
+    const done=!!d.fd[f.id], time=d.ft[f.id]||f.def;
+    html+=`<div class="row${done?' done':''}">
+      <div class="chk${done?' on':''}" data-a="fx" data-id="${f.id}"></div>
+      <div style="position:relative;flex-shrink:0">
+        <input class="t-input" type="time" value="${time}" data-a="fxt" data-id="${f.id}">
       </div>
-      <div class="sched-label">${f.label}</div>
+      <div class="row-label">${f.label}</div>
     </div>`;
   });
-  html += `</div>`;
+  html+=`</div>`;
 
-  // free blocks
-  html += `<div class="scard">
-    <div class="scard-header">
-      <span class="scard-icon">🕐</span>
-      <span class="scard-title">自由スケジュール</span>
-      <span style="font-size:11px;color:var(--sub)">9:00〜21:00</span>
-    </div>`;
-  d.freeBlocks.forEach((blk, i) => {
-    const done = !!blk.done;
-    html += `<div class="free-row${done?' done':''}">
-      <div class="check-circle${done?' on':''}" data-a="free-check" data-i="${i}"></div>
-      <div class="free-times">
-        <input class="free-time-input" type="time" value="${blk.start||''}" data-a="free-start" data-i="${i}">
-        <span class="time-sep">〜</span>
-        <input class="free-time-input" type="time" value="${blk.end||''}" data-a="free-end" data-i="${i}">
-      </div>
-      <input class="free-label-input" type="text" value="${esc(blk.label||'')}" placeholder="やること" data-a="free-label" data-i="${i}">
-      <button class="del-btn" data-a="free-del" data-i="${i}">×</button>
+  // free
+  html+=`<div class="section-label">自由スケジュール <span style="font-size:11px;font-weight:400;letter-spacing:0;text-transform:none">9:00〜21:00</span></div>
+  <div class="card">`;
+  d.fb.forEach((b,i)=>{
+    const done=!!b.done;
+    html+=`<div class="row${done?' done':''}">
+      <div class="chk${done?' on':''}" data-a="fr" data-i="${i}"></div>
+      <input class="t-input" type="time" value="${b.s||''}" data-a="frs" data-i="${i}" placeholder="開始">
+      <span class="t-sep">–</span>
+      <input class="t-input" type="time" value="${b.e||''}" data-a="fre" data-i="${i}" placeholder="終了">
+      <input class="free-label-inp" type="text" value="${e(b.l||'')}" placeholder="やること" data-a="frl" data-i="${i}">
+      <button class="del-btn" data-a="frd" data-i="${i}">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" fill="#C7C7CC"/><path d="M5 5l6 6M11 5l-6 6" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/></svg>
+      </button>
     </div>`;
   });
-  html += `<button class="add-block-btn" data-a="add-free">＋ ブロックを追加</button>
-  </div>`;
+  html+=`<button class="add-row" data-a="fra">
+    <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="8.5" stroke="#FF3B30" stroke-width="1"/><path d="M9 5.5v7M5.5 9h7" stroke="#FF3B30" stroke-width="1.5" stroke-linecap="round"/></svg>
+    <span>ブロックを追加</span>
+  </button></div>`;
 
   // todo
-  const todoDone = d.todos.filter(t=>t.done).length;
-  html += `<div class="scard">
-    <div class="scard-header">
-      <span class="scard-icon">✅</span>
-      <span class="scard-title">やることリスト</span>
-      <span class="scard-badge">${todoDone}/${d.todos.length}</span>
-    </div>`;
-  d.todos.forEach((t, i) => {
-    const done = !!t.done;
-    html += `<div class="todo-row${done?' done':''}">
-      <div class="check-sq${done?' on':''}" data-a="todo-check" data-i="${i}"></div>
-      <input class="todo-input-field${done?' done':''}" type="text" value="${esc(t.text||'')}" data-a="todo-text" data-i="${i}">
-      <button class="del-btn" data-a="todo-del" data-i="${i}">×</button>
+  const tdDone=d.todos.filter(t=>t.done).length;
+  html+=`<div class="section-label">やることリスト</div>
+  <div class="card">`;
+  d.todos.forEach((t,i)=>{
+    const done=!!t.done;
+    html+=`<div class="row${done?' done':''}">
+      <div class="chk-sq${done?' on':''}" data-a="td" data-i="${i}"></div>
+      <input class="todo-inp${done?' done':''}" type="text" value="${e(t.text||'')}" data-a="tdt" data-i="${i}">
+      <button class="del-btn" data-a="tdd" data-i="${i}">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" fill="#C7C7CC"/><path d="M5 5l6 6M11 5l-6 6" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/></svg>
+      </button>
     </div>`;
   });
-  html += `<div class="todo-add-wrap">
-    <input class="todo-new-input" id="todo-input" type="text" placeholder="タスクを追加..." inputmode="text">
-    <button class="add-btn" data-a="todo-add">追加</button>
+  html+=`<div class="todo-add-wrap">
+    <input class="todo-new-inp" id="todo-inp" type="text" placeholder="タスクを追加...">
+    <button class="todo-add-btn" data-a="tda">追加</button>
   </div></div>`;
 
   // streak
-  const days8 = get8Days();
-  const filledN = days8.filter(ds => state.days?.[ds]?.reflSaved).length;
-  html += `<div class="scard"><div class="scard-header"><span class="scard-icon">🔥</span><span class="scard-title">継続ゲージ</span></div>
-  <div class="streak-wrap"><div class="streak-dots">`;
-  days8.forEach((ds, i) => {
-    const filled = !!state.days?.[ds]?.reflSaved;
-    const isToday = ds === today;
-    html += `<div class="streak-dot${filled?' filled':''}${isToday?' today':''}">
-      <span class="dot-n">${i+1}</span>
-      <span class="dot-e">${filled?'🔥':'·'}</span>
+  const days8=get8();
+  const filled=days8.filter(ds2=>S.days?.[ds2]?.rs).length;
+  html+=`<div class="section-label">継続ゲージ</div>
+  <div class="card">
+    <div class="streak-wrap">
+      <div class="streak-dots">`;
+  days8.forEach((ds2,i)=>{
+    const f=!!S.days?.[ds2]?.rs, isT=ds2===today;
+    html+=`<div class="s-dot${f?' done':''}${isT&&!f?' today':''}">
+      <span class="dn">${i+1}</span>
+      <span class="de">${f?'✓':'·'}</span>
     </div>`;
   });
-  html += `</div></div><div class="streak-stat"><b>${filledN}</b> / 8日 振り返り完了</div></div>`;
+  html+=`</div><div class="streak-stat"><b>${filled}</b> / 8日 振り返り完了</div>
+    </div>
+  </div>`;
 
-  document.getElementById('home-content').innerHTML = html;
+  document.getElementById('home-body').innerHTML=html;
 }
 
-// ── render reflection ──
-function renderRefl() {
-  const today = todayStr();
-  const d = dayState(today);
-  const r = d.refl;
-  const saved = d.reflSaved;
+// ── RENDER REFLECTION ──
+function renderRefl(){
+  const today=todayStr(), d=ds(today);
+  const r=d.refl, saved=d.rs, ro=saved&&!reflEdit;
 
-  document.getElementById('refl-header').innerHTML = `
-    <div class="refl-header-title">🌙 夜の振り返り</div>
-    <div class="refl-header-sub">${jaDate(today)}</div>`;
+  document.getElementById('refl-header').innerHTML=`
+    <div class="screen-title">夜の振り返り</div>
+    <div class="screen-sub">${jaDate(today)}</div>`;
 
-  const ro = saved && !reflEditMode;
-  const val = (v) => esc(r[v]||'');
-  const placeholder = { done1:'できたこと①', done2:'できたこと②', done3:'できたこと③', anxiety:'不安なこと', tomorrow:'明日の目標' };
-
-  let html = '';
-
-  // できたこと
-  html += `<div class="refl-group">
-    <div class="refl-group-label"><span class="refl-dot g"></span>今日できたこと</div>
-    <div class="refl-items">`;
-  ['done1','done2','done3'].forEach((k,i) => {
-    html += `<div class="refl-item">
-      <span class="refl-item-num">${i+1}</span>
-      <textarea class="refl-textarea" data-k="${k}" placeholder="${placeholder[k]}" rows="1"${ro?' readonly':''}>${val(k)}</textarea>
+  const ta=(k,ph,num='')=>{
+    const v=e(r[k]||'');
+    return `<div class="refl-item">
+      ${num?`<span class="refl-num">${num}</span>`:''}
+      <textarea class="refl-ta" data-k="${k}" placeholder="${ph}" rows="1"${ro?' readonly':''}>${v}</textarea>
     </div>`;
-  });
-  html += `</div></div>`;
+  };
 
-  // 不安
-  html += `<div class="refl-group">
-    <div class="refl-group-label"><span class="refl-dot b"></span>不安だったこと</div>
-    <div class="refl-items">
-      <div class="refl-item">
-        <textarea class="refl-textarea" data-k="anxiety" placeholder="${placeholder.anxiety}" rows="1"${ro?' readonly':''}>${val('anxiety')}</textarea>
-      </div>
-    </div>
-  </div>`;
+  let html=`
+  <div class="section-label"><span class="lbl-dot g" style="width:6px;height:6px;border-radius:50%;background:#34C759;display:inline-block"></span> できたこと</div>
+  <div class="card">
+    ${ta('d1','できたこと①...','1')}
+    ${ta('d2','できたこと②...','2')}
+    ${ta('d3','できたこと③...','3')}
+  </div>
+  <div class="section-label"><span style="width:6px;height:6px;border-radius:50%;background:#007AFF;display:inline-block"></span> 不安だったこと</div>
+  <div class="card">${ta('ax','不安なこと...')}</div>
+  <div class="section-label"><span style="width:6px;height:6px;border-radius:50%;background:#FF9500;display:inline-block"></span> 明日やること</div>
+  <div class="card">${ta('tm','明日の目標...')}</div>`;
 
-  // 明日
-  html += `<div class="refl-group">
-    <div class="refl-group-label"><span class="refl-dot o"></span>明日やること</div>
-    <div class="refl-items">
-      <div class="refl-item">
-        <textarea class="refl-textarea" data-k="tomorrow" placeholder="${placeholder.tomorrow}" rows="1"${ro?' readonly':''}>${val('tomorrow')}</textarea>
-      </div>
-    </div>
-  </div>`;
-
-  if (saved && !reflEditMode) {
-    html += `<div class="refl-saved-wrap">
-      <div class="refl-saved-badge">✅ 振り返り保存済み</div>
-      <button class="refl-edit-btn" id="refl-edit-btn">編集する</button>
+  if(saved&&!reflEdit){
+    html+=`<div class="refl-saved-card">
+      <div class="refl-saved-text">✓ 振り返り保存済み</div>
+      <div class="refl-saved-sub">お疲れさまでした</div>
+      <button class="refl-edit-btn" id="r-edit">編集する</button>
     </div>`;
   } else {
-    html += `<button class="refl-save-btn" id="refl-save-btn">${saved?'再保存する':'振り返りを保存'}</button>`;
+    html+=`<button class="refl-save-btn" id="r-save">${saved?'再保存する':'振り返りを保存'}</button>`;
   }
 
-  document.getElementById('refl-content').innerHTML = html;
+  document.getElementById('refl-body').innerHTML=html;
 
-  // auto-resize textareas
-  document.querySelectorAll('.refl-textarea').forEach(ta => {
-    ta.style.height = 'auto';
-    ta.style.height = ta.scrollHeight + 'px';
-    ta.addEventListener('input', () => {
-      ta.style.height = 'auto';
-      ta.style.height = ta.scrollHeight + 'px';
-    });
+  document.querySelectorAll('.refl-ta').forEach(ta=>{
+    autoH(ta);
+    ta.addEventListener('input',()=>{ autoH(ta); r[ta.dataset.k]=ta.value; save(); });
   });
-
-  document.getElementById('refl-save-btn')?.addEventListener('click', () => {
-    d.reflSaved = true;
-    reflEditMode = false;
-    save();
-    renderRefl();
-  });
-  document.getElementById('refl-edit-btn')?.addEventListener('click', () => {
-    reflEditMode = true;
-    renderRefl();
-  });
-
-  document.querySelectorAll('.refl-textarea').forEach(ta => {
-    ta.addEventListener('input', () => {
-      d.refl[ta.dataset.k] = ta.value;
-      save();
-    });
-  });
+  document.getElementById('r-save')?.addEventListener('click',()=>{ d.rs=true; reflEdit=false; save(); renderRefl(); });
+  document.getElementById('r-edit')?.addEventListener('click',()=>{ reflEdit=true; renderRefl(); });
 }
 
-// ── render ──
-function render() {
-  if (!state.matchDate) { showSetup(); return; }
-  hideSetup();
-  if (tab === 'home') renderHome();
-  else if (tab === 'refl') renderRefl();
-  else if (tab === 'settings') {
-    document.getElementById('settings-date').value = state.matchDate;
+function autoH(ta){ ta.style.height='auto'; ta.style.height=ta.scrollHeight+'px'; }
+
+// ── HOME EVENTS ──
+const hb=document.getElementById('home-body');
+hb.addEventListener('click',e2=>{
+  const el=e2.target.closest('[data-a]'); if(!el) return;
+  const a=el.dataset.a, today=todayStr(), d=ds(today);
+  if(a==='fx'){ d.fd[el.dataset.id]=!d.fd[el.dataset.id]; save(); renderHome(); }
+  else if(a==='fr'){ d.fb[+el.dataset.i].done=!d.fb[+el.dataset.i].done; save(); renderHome(); }
+  else if(a==='frd'){ d.fb.splice(+el.dataset.i,1); save(); renderHome(); }
+  else if(a==='fra'){
+    d.fb.push({s:'',e:'',l:'',done:false}); save(); renderHome();
+    setTimeout(()=>{ const ins=document.querySelectorAll('[data-a="frs"]'); if(ins.length) ins[ins.length-1].focus(); },60);
   }
+  else if(a==='td'){ d.todos[+el.dataset.i].done=!d.todos[+el.dataset.i].done; save(); renderHome(); }
+  else if(a==='tdd'){ d.todos.splice(+el.dataset.i,1); save(); renderHome(); }
+  else if(a==='tda'){ addTodo(); }
+});
+hb.addEventListener('change',e2=>{
+  const el=e2.target, a=el.dataset.a; if(!a) return;
+  const d=ds(todayStr());
+  if(a==='fxt'){ d.ft[el.dataset.id]=el.value; save(); }
+  else if(a==='frs'){ d.fb[+el.dataset.i].s=el.value; save(); }
+  else if(a==='fre'){ d.fb[+el.dataset.i].e=el.value; save(); }
+});
+hb.addEventListener('input',e2=>{
+  const el=e2.target, a=el.dataset.a; if(!a) return;
+  const d=ds(todayStr());
+  if(a==='frl'){ d.fb[+el.dataset.i].l=el.value; save(); }
+  else if(a==='tdt'){ d.todos[+el.dataset.i].text=el.value; save(); }
+});
+hb.addEventListener('keydown',e2=>{
+  if(e2.key==='Enter'&&e2.target.id==='todo-inp'){ e2.preventDefault(); addTodo(); }
+});
+
+function addTodo(){
+  const inp=document.getElementById('todo-inp'); if(!inp) return;
+  const txt=inp.value.trim(); if(!txt) return;
+  ds(todayStr()).todos.push({text:txt,done:false}); save(); renderHome();
+  setTimeout(()=>{ const el=document.getElementById('todo-inp'); if(el) el.focus(); },60);
 }
 
-function showSetup() {
-  document.getElementById('setup-screen').style.display = 'flex';
+// ── NAV ──
+document.querySelectorAll('.nav-btn').forEach(b=>{
+  b.addEventListener('click',()=>{
+    tab=b.dataset.tab;
+    document.querySelectorAll('.nav-btn').forEach(x=>x.classList.toggle('active',x===b));
+    document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+    document.getElementById(`screen-${tab}`).classList.add('active');
+    if(tab==='home') renderHome();
+    else if(tab==='refl'){ reflEdit=false; renderRefl(); }
+    else if(tab==='settings') document.getElementById('settings-date').value=S.matchDate||'';
+  });
+});
+
+// ── SETTINGS ──
+document.getElementById('settings-save').addEventListener('click',()=>{
+  const v=document.getElementById('settings-date').value; if(!v) return;
+  S.matchDate=v; S.startDate=startFrom(v); save();
+  document.querySelector('[data-tab="home"]').click();
+});
+document.getElementById('reset-btn').addEventListener('click',()=>{
+  if(confirm('すべてのデータをリセットしますか？')){ localStorage.removeItem(LS); S={}; showSetup(); }
+});
+
+// ── SETUP ──
+document.getElementById('setup-btn').addEventListener('click',()=>{
+  const v=document.getElementById('setup-date').value; if(!v) return;
+  S.matchDate=v; S.startDate=startFrom(v); save(); hideSetup(); renderHome();
+});
+
+function showSetup(){
+  document.getElementById('setup-screen').style.display='flex';
   document.getElementById('app-screen').classList.remove('show');
-  const def = new Date(); def.setDate(def.getDate()+8);
-  document.getElementById('setup-date').value = dStr(def);
+  const def=new Date(); def.setDate(def.getDate()+8);
+  document.getElementById('setup-date').value=dStr(def);
 }
-function hideSetup() {
-  document.getElementById('setup-screen').style.display = 'none';
+function hideSetup(){
+  document.getElementById('setup-screen').style.display='none';
   document.getElementById('app-screen').classList.add('show');
 }
-function switchTab(t) {
-  tab = t;
-  document.querySelectorAll('.nav-tab').forEach(b => b.classList.toggle('active', b.dataset.tab===t));
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById(`screen-${t}`).classList.add('active');
-  render();
-}
 
-function esc(s) {
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-
-// ── Home events ──
-document.getElementById('home-content').addEventListener('click', e => {
-  const el = e.target.closest('[data-a]');
-  if (!el) return;
-  const a = el.dataset.a;
-  const today = todayStr();
-  const d = dayState(today);
-
-  if (a === 'fx-check') {
-    d.fixedDone[el.dataset.id] = !d.fixedDone[el.dataset.id];
-    save(); renderHome();
-  } else if (a === 'free-check') {
-    d.freeBlocks[+el.dataset.i].done = !d.freeBlocks[+el.dataset.i].done;
-    save(); renderHome();
-  } else if (a === 'free-del') {
-    d.freeBlocks.splice(+el.dataset.i, 1);
-    save(); renderHome();
-  } else if (a === 'add-free') {
-    d.freeBlocks.push({ start:'', end:'', label:'', done:false });
-    save(); renderHome();
-    setTimeout(() => {
-      const ins = document.querySelectorAll('[data-a="free-start"]');
-      if (ins.length) ins[ins.length-1].focus();
-    }, 60);
-  } else if (a === 'todo-check') {
-    d.todos[+el.dataset.i].done = !d.todos[+el.dataset.i].done;
-    save(); renderHome();
-  } else if (a === 'todo-del') {
-    d.todos.splice(+el.dataset.i, 1);
-    save(); renderHome();
-  } else if (a === 'todo-add') {
-    addTodo();
-  }
-});
-
-document.getElementById('home-content').addEventListener('change', e => {
-  const el = e.target;
-  const a = el.dataset.a;
-  if (!a) return;
-  const d = dayState(todayStr());
-  if (a === 'fx-time') { d.fixedTimes[el.dataset.id] = el.value; save(); }
-  else if (a === 'free-start') { d.freeBlocks[+el.dataset.i].start = el.value; save(); }
-  else if (a === 'free-end') { d.freeBlocks[+el.dataset.i].end = el.value; save(); }
-});
-
-document.getElementById('home-content').addEventListener('input', e => {
-  const el = e.target;
-  const a = el.dataset.a;
-  if (!a) return;
-  const d = dayState(todayStr());
-  if (a === 'free-label') { d.freeBlocks[+el.dataset.i].label = el.value; save(); }
-  else if (a === 'todo-text') { d.todos[+el.dataset.i].text = el.value; save(); }
-});
-
-document.getElementById('home-content').addEventListener('keydown', e => {
-  if (e.key === 'Enter' && e.target.id === 'todo-input') { e.preventDefault(); addTodo(); }
-});
-
-function addTodo() {
-  const inp = document.getElementById('todo-input');
-  if (!inp) return;
-  const text = inp.value.trim();
-  if (!text) return;
-  const d = dayState(todayStr());
-  d.todos.push({ text, done:false });
-  save(); renderHome();
-  setTimeout(() => { const el = document.getElementById('todo-input'); if (el) el.focus(); }, 60);
-}
-
-// ── Nav ──
-document.querySelectorAll('.nav-tab').forEach(btn => {
-  btn.addEventListener('click', () => switchTab(btn.dataset.tab));
-});
-
-// ── Settings ──
-document.getElementById('settings-save-btn').addEventListener('click', () => {
-  const v = document.getElementById('settings-date').value;
-  if (!v) return;
-  state.matchDate = v;
-  state.startDate = startFrom(v);
-  save(); switchTab('home');
-});
-document.getElementById('reset-btn').addEventListener('click', () => {
-  if (confirm('すべてのデータをリセットしますか？')) {
-    localStorage.removeItem(LS);
-    state = {};
-    render();
-  }
-});
-
-// ── Setup ──
-document.getElementById('setup-btn').addEventListener('click', () => {
-  const v = document.getElementById('setup-date').value;
-  if (!v) return;
-  state.matchDate = v;
-  state.startDate = startFrom(v);
-  save(); render();
-});
-
-// ── Init ──
-if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js');
+// ── INIT ──
+if('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js');
 load();
-render();
+if(!S.matchDate){ showSetup(); }
+else { hideSetup(); renderHome(); }
 </script>
 </body>
 </html>
