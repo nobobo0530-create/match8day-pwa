@@ -559,10 +559,10 @@ hb.addEventListener('click',ev=>{
 hb.addEventListener('change',ev=>{
   const el=ev.target,a=el.dataset.a;if(!a)return;
   const d=ds(todayStr());
-  if(a==='fxs'){d.ft[el.dataset.id+'-s']=el.value;save();renderHome();}
-  else if(a==='fxe'){d.ft[el.dataset.id+'-e']=el.value;save();renderHome();}
-  else if(a==='frs'){d.fb[+el.dataset.i].s=el.value;save();renderHome();}
-  else if(a==='fre'){d.fb[+el.dataset.i].e=el.value;save();renderHome();}
+  if(a==='fxs'){d.ft[el.dataset.id+'-s']=el.value;save();}
+  else if(a==='fxe'){d.ft[el.dataset.id+'-e']=el.value;save();}
+  else if(a==='frs'){d.fb[+el.dataset.i].s=el.value;save();}
+  else if(a==='fre'){d.fb[+el.dataset.i].e=el.value;save();}
 });
 hb.addEventListener('input',ev=>{
   const el=ev.target,a=el.dataset.a;if(!a)return;
